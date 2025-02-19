@@ -1,0 +1,273 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+@import url('https://unpkg.com/leaflet/dist/leaflet.css');
+@import url('https://unpkg.com/leaflet-compass/dist/leaflet-compass.css');
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0c2340;
+  color: #fff;
+}
+
+/* Main container filling entire viewport */
+.dashboard-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+}
+
+/* Top Bar */
+.top-bar {
+  width: 100%;
+  background: #092036;
+  border-radius: 16px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.top-left,
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.top-center {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Main Dash Panel */
+.main-dash {
+  flex: 1;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  background: #0e2f4a;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dash-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+}
+
+/* Gauge styling */
+.gauge-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Make the gauge bigger */
+.gauge-wrapper > div > svg {
+  width: 300px !important;
+  height: 200px !important;
+}
+
+/* Label below each gauge */
+.gauge-label {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.gauge-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  display: block;
+}
+
+.gauge-unit {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+/* Battery / Temp bar (renamed from "fuel-bar") */
+.battery-bar {
+  margin-top: 1rem;
+  width: 120px;
+  text-align: center;
+}
+
+.battery-bar-title {
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.battery-bar-track {
+  background: rgba(255, 255, 255, 0.2);
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  position: relative;
+  margin-top: 0.25rem;
+}
+
+.battery-bar-fill {
+  background: #2ecc71;
+  height: 8px;
+  border-radius: 4px;
+}
+
+/* Center info: wind speed & arrow controls */
+.center-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.center-info-item {
+  text-align: center;
+}
+
+.wind-speed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.info-value {
+  margin-top: 0.25rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Arrow control replaces "Up" / "Down" text */
+.arrow-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.arrow-control button {
+  background: #0b3d91;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  width: 60px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.arrow-control button:hover {
+  background: #0d52bf;
+}
+
+/* Bottom Nav Panel */
+.bottom-nav {
+  width: 100%;
+  background: #092036;
+  border-radius: 16px;
+  padding: 0.75rem 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item span {
+  font-size: 0.85rem;
+}
+
+/* Wind speed display styles */
+.wind-speed-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 1rem;
+}
+
+.wind-speed-display {
+  text-align: center;
+  color: #fff;
+}
+
+/* Wind speed header: icon and description on one line */
+.wind-speed-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Wind speed label styling */
+.wind-speed-label {
+  font-weight: 600;
+}
+
+/* Wind speed value on a separate line */
+.wind-speed-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+/* --- Navigation Map Adjustments --- */
+/* Container for the navigation map layout in the Rout tab */
+.navigation-map-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* Left: Compass section occupies 40% */
+.navigation-map-compass {
+  width: 40%;
+  background-color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Right: Map section occupies 60% */
+.navigation-map-leaflet {
+  width: 60%;
+  height: 100%;
+}
+
+/* Ensure the Leaflet map fills its container */
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+}

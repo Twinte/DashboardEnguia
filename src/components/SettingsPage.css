@@ -1,0 +1,146 @@
+/* src/components/SettingsPage.css */
+.settings-page {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.settings-sidebar {
+  width: 20%; /* Sidebar width */
+  background-color: #1d2b3a;
+  color: white;
+  padding: 1rem;
+  border-right: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Push user profile to the bottom */
+}
+
+.sidebar-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.settings-sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.settings-sidebar li {
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.settings-sidebar li:hover,
+.settings-sidebar li.active {
+  background-color: #324756;
+}
+
+.user-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;  /* Center the profile info */
+}
+
+.user-profile .user-info {
+  display: flex;
+  flex-direction: column;  /* Stack name and email vertically */
+  align-items: center;
+}
+
+.user-name {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;  /* Add space between name and email */
+}
+
+.user-email {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.settings-content {
+  width: 80%; /* Main content area takes the remaining 80% */
+  padding: 1rem;
+  background-color: #0f2c42;
+  color: white;
+}
+
+.settings-content h2 {
+  margin-bottom: 1rem;
+}
+
+.settings-list {
+  margin-top: 1rem;
+}
+
+.setting-item {
+  margin-bottom: 1rem;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background-color: #1c3348;
+  transition: background-color 0.3s ease;
+}
+
+.setting-item:hover {
+  background-color: #324756;
+}
+
+.setting-item h3 {
+  margin: 0;
+}
+
+.setting-item p {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.setting-item input,
+.setting-item select {
+  margin-top: 10px;
+  padding: 5px;
+  background-color: #324756;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.setting-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+}
+
+.action-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 10px;
+}
+
+.action-buttons button {
+  background-color: #324756;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.action-buttons button:hover {
+  background-color: #2a3a4b;
+}
+
+.action-buttons .save-btn {
+  background-color: #2ecc71;
+}
+
+.action-buttons .save-btn:hover {
+  background-color: #27ae60;
+}

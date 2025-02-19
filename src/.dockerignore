@@ -1,0 +1,8 @@
+node_modules
+.git
+.DS_Store
+build
+.cache
+.env        # Exclude environment variables for security
+Dockerfile  # No need to include the Dockerfile itself
+.dockerignore
