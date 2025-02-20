@@ -243,26 +243,58 @@ body {
 }
 
 /* --- Navigation Map Adjustments --- */
-/* Container for the navigation map layout in the Rout tab */
+/* Navigation Map Layout */
 .navigation-map-container {
   display: flex;
   width: 100%;
   height: 100%;
 }
 
-/* Left: Compass section occupies 40% */
-.navigation-map-compass {
-  width: 40%;
-  background-color: #333;
+.navigation-map-left {
+  width: 40%; /* Left column occupies 40% of the width */
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #333;
   padding: 1rem;
 }
 
-/* Right: Map section occupies 60% */
+.navigation-compass {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50%; /* Top half for compass */
+}
+
+.navigation-metrics {
+  height: 50%; /* Bottom half for metrics */
+  color: #fff;
+  padding-top: 1rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 10px;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.metric-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
 .navigation-map-leaflet {
-  width: 60%;
+  width: 60%; /* Right column occupies 60% of the width */
   height: 100%;
 }
 
