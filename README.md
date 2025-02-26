@@ -53,14 +53,13 @@ Para rodar o projeto localmente, siga os seguintes passos:
 git clone https://github.com/seu-usuario/dashboard-embarcacao-eletrica.git
 cd dashboard-embarcacao-eletrica
 
+
 ### 2. **Instalar as dependências**
 
-```bash
 npm install
 
 ### 3. **Rodar a aplicação**
 
-```bash
 npm run dev
 
 Isso irá iniciar o servidor de desenvolvimento e você poderá acessar o dashboard localmente em http://localhost:5173.
