@@ -1,11 +1,12 @@
 // src/components/NavigationMap.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { FaCompass } from "react-icons/fa";
+import RecenterMap from "./RecenterMap";
 
-// Fix default Leaflet icon paths (if needed)
+// Fix default Leaflet icon paths
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -14,7 +15,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
 
-// Provide default metrics if none are passed in.
 const defaultMetrics = {
   coordinates: { lat: 0, lng: 0 },
   eta: "N/A",
@@ -23,21 +23,38 @@ const defaultMetrics = {
 };
 
 const NavigationMap = ({ heading, metrics = defaultMetrics }) => {
-  // Define center coordinates and zoom level for the map
-  const center = [51.505, -0.09]; // Example coordinates; adjust as needed
-  const zoom = 10;
+  const [location, setLocation] = useState({
+    lat: 51.505,  
+    lng: -0.09,  
+  });
+
+  const [mapZoom] = useState(12);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log("Location fetched:", position.coords);
+          setLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error getting location: ", error);
+        }
+      );
+    }
+  }, []);
 
   return (
     <div className="navigation-map-container">
-      {/* Left Column: Compass and Metrics */}
       <div className="navigation-map-left">
-        {/* Top Half: Compass */}
         <div className="navigation-compass">
           <div style={{ transform: `rotate(${heading}deg)` }}>
             <FaCompass size={100} color="#fff" />
           </div>
         </div>
-        {/* Bottom Half: Metrics Grid */}
         <div className="navigation-metrics">
           <div className="metrics-grid">
             <div className="metric-item">
@@ -61,20 +78,23 @@ const NavigationMap = ({ heading, metrics = defaultMetrics }) => {
           </div>
         </div>
       </div>
-      {/* Right Column: Map */}
+
       <div className="navigation-map-leaflet">
-        <MapContainer center={center} zoom={zoom} style={{ width: "100%", height: "100%" }}>
-          {/* Base Layer: OpenStreetMap */}
+        <MapContainer
+          center={[location.lat, location.lng]}
+          zoom={mapZoom}
+          style={{ width: "100%", height: "100%" }}
+        >
+          <RecenterMap lat={location.lat} lng={location.lng} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {/* Overlay: OpenSeaMap */}
           <TileLayer
             attribution='Map data: &copy; <a href="https://www.openseamap.org/">OpenSeaMap</a> contributors'
             url="https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png"
           />
-          <Marker position={center}>
+          <Marker position={[location.lat, location.lng]}>
             <Popup>You are here!</Popup>
           </Marker>
         </MapContainer>
