@@ -303,3 +303,11 @@ body {
   height: 100% !important;
   width: 100% !important;
 }
+
+.warnings {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  margin-top: 5px;
+}
+
