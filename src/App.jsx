@@ -10,7 +10,8 @@ import {
   MdSettings, 
   MdPowerSettingsNew, 
   MdHome, 
-  MdSurfing 
+  MdWifiOff, 
+  MdWifi 
 } from "react-icons/md";
 import { GiPathDistance } from "react-icons/gi";
 import { WiStrongWind, WiThunderstorm } from "react-icons/wi";
