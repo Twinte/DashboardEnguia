@@ -3,62 +3,67 @@ import React, { useEffect, useState } from "react";
 import GaugeChart from "react-gauge-chart";
 import { 
   FaBatteryFull, 
-  FaTemperatureHigh 
+  FaTemperatureHigh, 
+  FaExclamationTriangle 
 } from "react-icons/fa";
 import { 
   MdSettings, 
   MdPowerSettingsNew, 
   MdHome, 
-  MdSurfing 
+  MdWifiOff, 
+  MdWifi 
 } from "react-icons/md";
 import { GiPathDistance } from "react-icons/gi";
-import { WiStrongWind } from "react-icons/wi";
+import { WiStrongWind, WiThunderstorm } from "react-icons/wi";
 import SettingsPage from "./components/SettingsPage";
 import NavigationMap from "./components/NavigationMap";
 import "./App.css";
 
 function App() {
-  // Manage active tab: "home", "rout", "settings", etc.
+  // Gerenciar a aba ativa: "home", "rout", "settings", etc.
   const [activeTab, setActiveTab] = useState("home");
 
-  // State to hold sensor data from the API.
+  // Estado para armazenar os dados dos sensores vindos da API.
   const [sensorData, setSensorData] = useState({
     date: "N/A",
     time: "N/A",
     speedKPH: 0,
     rpm: 0,
     batteryVoltage: 0,
-    batteryPercentage: 0,
+    batteryPercentage: 100, // Assumindo 100% inicialmente
     windSpeed: 0,
     temp: 0,
-    heading: 0, // Default heading, if not provided by the API.
+    heading: 0, // Valor padrão de heading se não fornecido pela API.
+    lat: 0,
+    lng: 0,
   });
 
-  // Function to fetch data from the API.
+  // Variável simulada para o sinal WiFi: true se conectado, false se não.
+  const wifiConnected = true; // Altere para false para testar
+
   useEffect(() => {
     const fetchData = () => {
       fetch("http://192.168.1.173:8000/api/latest")
         .then((response) => response.json())
         .then((data) => {
-          // Map the JSON fields from the API to our sensorData state.
-          // Assuming the API returns keys like: Timestamp, Velocidade_KPH, RPM, Voltagem_bateria, Porcentagem_bateria, Velocidade_vento, Temperatura
           setSensorData({
-            // Split Timestamp into date and time (customize as needed)
             date: data.Timestamp ? data.Timestamp.split(" ")[0] : "N/A",
             time: data.Timestamp ? data.Timestamp.split(" ")[1] : "N/A",
             speedKPH: data.Velocidade_KPH || 0,
             rpm: data.RPM || 0,
             batteryVoltage: data.Voltagem_bateria || 0,
-            batteryPercentage: data.Porcentagem_bateria || 0,
+            batteryPercentage: data.Porcentagem_bateria || 100,
             windSpeed: data.Velocidade_vento || 0,
             temp: data.Temperatura || 0,
-            heading: data.heading || 0, // If heading is not provided, default to 0
+            heading: data.heading || 0,
+            lat: data.lat || 51.505,   // Se houver dados de localização, use-os; senão, padrão
+            lng: data.lng || -0.09,
           });
         })
         .catch((err) => console.error("Error fetching sensor data:", err));
     };
 
-    // Poll data every 2 seconds when the Home tab is active.
+    // Busca os dados a cada 2 segundos quando a aba "home" estiver ativa.
     if (activeTab === "home") {
       fetchData();
       const intervalId = setInterval(fetchData, 2000);
@@ -68,7 +73,7 @@ function App() {
 
   return (
     <div className="dashboard-container">
-      {/* Top Bar (common to all tabs) */}
+      {/* Top Bar (comum a todas as abas) */}
       <div className="top-bar">
         <div className="top-left">
           <span className="date">{sensorData.date}</span>
@@ -81,18 +86,38 @@ function App() {
             <FaBatteryFull />
             <span>{sensorData.batteryVoltage.toFixed(1)}V</span>
           </div>
+          {/* Ícone de WiFi posicionado entre a bateria e a temperatura */}
+          <div className="wifi-status">
+            { !wifiConnected ? (
+              <MdWifiOff color="red" title="Sem sinal de WiFi" size={20} />
+            ) : (
+              <MdWifi color="white" title="WiFi conectado" size={20} />
+            )}
+          </div>
           <div className="temperature">
             <FaTemperatureHigh />
             <span>{sensorData.temp}°C</span>
           </div>
+          {/* Outros ícones de alerta (excluindo o WiFi, que já está posicionado separadamente) */}
+          <div className="warnings">
+            { sensorData.temp > 40 && (
+              <FaExclamationTriangle color="red" title="Temperatura alta" size={20} />
+            )}
+            { sensorData.batteryPercentage < 20 && (
+              <FaExclamationTriangle color="red" title="Bateria baixa" size={20} />
+            )}
+            { sensorData.windSpeed > 70 && (
+              <WiThunderstorm color="red" title="Condições climáticas adversas" size={20} />
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Center Content */}
+      {/* Conteúdo Central */}
       <div className="main-dash">
         {activeTab === "home" ? (
           <div className="dash-content">
-            {/* Left Column: Speed Gauge */}
+            {/* Coluna Esquerda: Gauge de Velocidade */}
             <div className="gauge-wrapper">
               <GaugeChart
                 id="speed-gauge"
@@ -109,7 +134,6 @@ function App() {
                 <span className="gauge-value">{sensorData.speedKPH}</span>
                 <span className="gauge-unit">KPH</span>
               </div>
-              {/* Battery Bar below Speed Gauge */}
               <div className="battery-bar">
                 <span className="battery-bar-title">
                   <FaBatteryFull style={{ marginRight: "4px" }} />
@@ -124,7 +148,7 @@ function App() {
               </div>
             </div>
 
-            {/* Center Column: Wind Speed */}
+            {/* Coluna Central: Velocidade do Vento */}
             <div className="wind-speed-wrapper">
               <div className="wind-speed-display">
                 <div className="wind-speed-header">
@@ -135,7 +159,7 @@ function App() {
               </div>
             </div>
 
-            {/* Right Column: RPM Gauge */}
+            {/* Coluna Direita: Gauge de RPM */}
             <div className="gauge-wrapper">
               <GaugeChart
                 id="rpm-gauge"
@@ -152,7 +176,6 @@ function App() {
                 <span className="gauge-value">{sensorData.rpm}</span>
                 <span className="gauge-unit">RPM</span>
               </div>
-              {/* Temperature Bar below RPM Gauge */}
               <div className="battery-bar">
                 <span className="battery-bar-title">Temp</span>
                 <div className="battery-bar-track">
@@ -165,12 +188,11 @@ function App() {
             </div>
           </div>
         ) : activeTab === "rout" ? (
-          // Rout tab: display the navigation map with compass and metrics
           <NavigationMap heading={sensorData.heading} metrics={{
             coordinates: { lat: sensorData.lat || 0, lng: sensorData.lng || 0 },
-            eta: "N/A",                // Replace with real values if available
-            timeRemaining: "N/A",      // Replace with real values if available
-            batteryRange: "N/A",       // Replace with real values if available
+            eta: "N/A",                
+            timeRemaining: "N/A",      
+            batteryRange: "N/A",       
           }} />
         ) : activeTab === "settings" ? (
           <SettingsPage />
@@ -181,7 +203,7 @@ function App() {
         )}
       </div>
 
-      {/* Bottom Navigation (common to all tabs) */}
+      {/* Navegação Inferior (comum a todas as abas) */}
       <div className="bottom-nav">
         <div className="nav-item" onClick={() => setActiveTab("home")}>
           <MdHome size={22} />
@@ -190,10 +212,6 @@ function App() {
         <div className="nav-item" onClick={() => setActiveTab("power")}>
           <MdPowerSettingsNew size={22} />
           <span>Power</span>
-        </div>
-        <div className="nav-item" onClick={() => setActiveTab("surf")}>
-          <MdSurfing size={22} />
-          <span>Surf</span>
         </div>
         <div className="nav-item" onClick={() => setActiveTab("rout")}>
           <GiPathDistance size={22} />
