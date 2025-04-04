@@ -10,9 +10,11 @@ import {
   MdSettings, 
   MdPowerSettingsNew, 
   MdHome, 
-  MdSurfing 
+  MdWifiOff, 
+  MdWifi 
 } from "react-icons/md";
 import { GiPathDistance } from "react-icons/gi";
+import { WiStrongWind, WiThunderstorm } from "react-icons/wi";
 import { WiStrongWind, WiThunderstorm } from "react-icons/wi";
 import SettingsPage from "./components/SettingsPage";
 import NavigationMap from "./components/NavigationMap";
@@ -20,8 +22,10 @@ import "./App.css";
 
 function App() {
   // Gerenciar a aba ativa: "home", "rout", "settings", etc.
+  // Gerenciar a aba ativa: "home", "rout", "settings", etc.
   const [activeTab, setActiveTab] = useState("home");
 
+  // Estado para armazenar os dados dos sensores vindos da API.
   // Estado para armazenar os dados dos sensores vindos da API.
   const [sensorData, setSensorData] = useState({
     date: "N/A",
@@ -30,8 +34,12 @@ function App() {
     rpm: 0,
     batteryVoltage: 0,
     batteryPercentage: 100, // Assumindo 100% inicialmente
+    batteryPercentage: 100, // Assumindo 100% inicialmente
     windSpeed: 0,
     temp: 0,
+    heading: 0, // Valor padrão de heading se não fornecido pela API.
+    lat: 0,
+    lng: 0,
     heading: 0, // Valor padrão de heading se não fornecido pela API.
     lat: 0,
     lng: 0,
@@ -52,8 +60,12 @@ function App() {
             rpm: data.RPM || 0,
             batteryVoltage: data.Voltagem_bateria || 0,
             batteryPercentage: data.Porcentagem_bateria || 100,
+            batteryPercentage: data.Porcentagem_bateria || 100,
             windSpeed: data.Velocidade_vento || 0,
             temp: data.Temperatura || 0,
+            heading: data.heading || 0,
+            lat: data.lat || 51.505,   // Se houver dados de localização, use-os; senão, padrão
+            lng: data.lng || -0.09,
             heading: data.heading || 0,
             lat: data.lat || 51.505,   // Se houver dados de localização, use-os; senão, padrão
             lng: data.lng || -0.09,
@@ -62,6 +74,7 @@ function App() {
         .catch((err) => console.error("Error fetching sensor data:", err));
     };
 
+    // Busca os dados a cada 2 segundos quando a aba "home" estiver ativa.
     // Busca os dados a cada 2 segundos quando a aba "home" estiver ativa.
     if (activeTab === "home") {
       fetchData();
@@ -72,6 +85,7 @@ function App() {
 
   return (
     <div className="dashboard-container">
+      {/* Top Bar (comum a todas as abas) */}
       {/* Top Bar (comum a todas as abas) */}
       <div className="top-bar">
         <div className="top-left">
@@ -84,6 +98,14 @@ function App() {
           <div className="battery-level">
             <FaBatteryFull />
             <span>{sensorData.batteryVoltage.toFixed(1)}V</span>
+          </div>
+          {/* Ícone de WiFi posicionado entre a bateria e a temperatura */}
+          <div className="wifi-status">
+            { !wifiConnected ? (
+              <MdWifiOff color="red" title="Sem sinal de WiFi" size={20} />
+            ) : (
+              <MdWifi color="white" title="WiFi conectado" size={20} />
+            )}
           </div>
           {/* Ícone de WiFi posicionado entre a bateria e a temperatura */}
           <div className="wifi-status">
@@ -109,13 +131,27 @@ function App() {
               <WiThunderstorm color="red" title="Condições climáticas adversas" size={20} />
             )}
           </div>
+          {/* Outros ícones de alerta (excluindo o WiFi, que já está posicionado separadamente) */}
+          <div className="warnings">
+            { sensorData.temp > 40 && (
+              <FaExclamationTriangle color="red" title="Temperatura alta" size={20} />
+            )}
+            { sensorData.batteryPercentage < 20 && (
+              <FaExclamationTriangle color="red" title="Bateria baixa" size={20} />
+            )}
+            { sensorData.windSpeed > 70 && (
+              <WiThunderstorm color="red" title="Condições climáticas adversas" size={20} />
+            )}
+          </div>
         </div>
       </div>
 
       {/* Conteúdo Central */}
+      {/* Conteúdo Central */}
       <div className="main-dash">
         {activeTab === "home" ? (
           <div className="dash-content">
+            {/* Coluna Esquerda: Gauge de Velocidade */}
             {/* Coluna Esquerda: Gauge de Velocidade */}
             <div className="gauge-wrapper">
               <GaugeChart
@@ -148,6 +184,7 @@ function App() {
             </div>
 
             {/* Coluna Central: Velocidade do Vento */}
+            {/* Coluna Central: Velocidade do Vento */}
             <div className="wind-speed-wrapper">
               <div className="wind-speed-display">
                 <div className="wind-speed-header">
@@ -158,6 +195,7 @@ function App() {
               </div>
             </div>
 
+            {/* Coluna Direita: Gauge de RPM */}
             {/* Coluna Direita: Gauge de RPM */}
             <div className="gauge-wrapper">
               <GaugeChart
@@ -192,6 +230,9 @@ function App() {
             eta: "N/A",                
             timeRemaining: "N/A",      
             batteryRange: "N/A",       
+            eta: "N/A",                
+            timeRemaining: "N/A",      
+            batteryRange: "N/A",       
           }} />
         ) : activeTab === "settings" ? (
           <SettingsPage />
@@ -202,6 +243,7 @@ function App() {
         )}
       </div>
 
+      {/* Navegação Inferior (comum a todas as abas) */}
       {/* Navegação Inferior (comum a todas as abas) */}
       <div className="bottom-nav">
         <div className="nav-item" onClick={() => setActiveTab("home")}>
