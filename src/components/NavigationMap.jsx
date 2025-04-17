@@ -1,10 +1,20 @@
 // src/components/NavigationMap.jsx
 import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
+import { useMapEvent } from "react-leaflet"; // Import para capturar eventos no Mapa
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { FaCompass } from "react-icons/fa";
 import RecenterMap from "./RecenterMap";
+
+// Função para capturar o Clique direteamente no Mapa
+function MapClickHandler({ onClick }) {
+  useMapEvent("click", (e) => {
+    console.log("Clique detectado:", e.latlng);
+    onClick(e);
+  });
+  return null;
+}
 
 // Função para calcular a distância entre duas coordenadas geográficas
 const getDistance = (lat1, lng1, lat2, lng2) => {
@@ -123,8 +133,10 @@ const NavigationMap = ({ heading }) => {
           center={[location.lat, location.lng]}
           zoom={mapZoom}
           style={{ width: "100%", height: "100%" }}
-          whenCreated={map => map.on('click', handleClick)} // Adiciona o clique no mapa
+          // whenCreated={map => map.on('click', handleClick)} // Adiciona o clique no mapa
         >
+          //Lido diretamente com o evento de clique no mapa e posteriormente defino o destino
+          <MapClickHandler onClick={handleClick} /> 
           <RecenterMap lat={location.lat} lng={location.lng} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
@@ -138,8 +150,18 @@ const NavigationMap = ({ heading }) => {
             <Popup>You are here!</Popup>
           </Marker>
           {destination && (
-            <Marker position={[destination.lat, destination.lng]}>
-              <Popup>Destination</Popup>
+            <Marker
+              position={[destination.lat, destination.lng]}
+              draggable={true}
+              eventHandlers={{
+                dragend: (e) => {
+                  const marker = e.target;
+                  const position = marker.getLatLng();
+                  setDestination({ lat: position.lat, lng: position.lng });
+                },
+              }}
+            >
+              <Popup>Drag me to change destination</Popup>
             </Marker>
           )}
           {destination && (
