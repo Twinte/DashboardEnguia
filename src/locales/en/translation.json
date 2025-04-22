@@ -1,0 +1,14 @@
+{
+    "settings": "Settings",
+    "appearance": "Appearance",
+    "language": "Language",
+    "theme": "Theme",
+    "light_theme": "Light",
+    "dark_theme": "Dark",
+    "home_tab": "Home",
+    "power_tab": "Power",
+    "rout_tab": "Rout",
+    "settings_tab": "Settings",
+    "save_changes": "Save Changes",
+    "cancel": "Cancel"
+  }
