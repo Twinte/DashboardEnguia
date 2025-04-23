@@ -1,0 +1,104 @@
+/* src/components/PowerPage.css */
+
+.power-page-container {
+    display: flex;
+    flex-direction: column; /* Organiza verticalmente: medidor em cima, detalhes em baixo */
+    align-items: center; /* Centraliza horizontalmente */
+    justify-content: space-around; /* Distribui espaço verticalmente */
+    width: 100%;
+    height: 100%;
+    padding: 1.5rem;
+    color: var(--text-primary);
+    overflow-y: auto; /* Permite scroll se o conteúdo for muito grande */
+  }
+  
+  /* Secção do medidor principal */
+  .power-main-gauge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2rem; /* Espaço abaixo do medidor */
+  }
+  
+  .power-percentage-label {
+    display: flex;
+    flex-direction: column; /* Ícone, valor, unidade empilhados */
+    align-items: center;
+    margin-top: -2rem; /* Ajusta posição vertical do label em relação ao gauge */
+    position: relative; /* Permite ajuste fino */
+  }
+  
+  .power-percentage-label .label-icon {
+    font-size: 1.5rem; /* Tamanho do ícone de bateria */
+    margin-bottom: 0.25rem;
+    color: var(--text-secondary);
+  }
+  
+  .power-percentage-label .value {
+    font-size: 3rem; /* Tamanho grande para a percentagem */
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  
+  .power-percentage-label .unit {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    opacity: 0.9;
+  }
+  
+  /* Secção de detalhes */
+  .power-details {
+    display: grid; /* Usa grid para organizar os detalhes */
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Colunas responsivas */
+    gap: 1.5rem; /* Espaço entre os itens de detalhe */
+    width: 100%;
+    max-width: 800px; /* Limita a largura da secção de detalhes */
+  }
+  
+  .detail-item {
+    display: flex; /* Ícone e texto lado a lado */
+    align-items: center; /* Alinha verticalmente */
+    background-color: var(--background-nav); /* Fundo sutil */
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+  }
+  
+  .detail-icon {
+    font-size: 2rem; /* Tamanho dos ícones de detalhe */
+    margin-right: 1rem; /* Espaço entre ícone e texto */
+    color: var(--text-primary); /* Cor do ícone */
+    flex-shrink: 0; /* Evita que o ícone encolha */
+  }
+  
+  /* Cores específicas para ícones (opcional) */
+  .voltage-icon {
+    color: #f1c40f; /* Amarelo */
+  }
+  .temp-icon {
+    color: #e74c3c; /* Vermelho */
+  }
+  .consumption-icon {
+    color: #3498db; /* Azul */
+  }
+  .autonomy-icon {
+    color: #9b59b6; /* Roxo */
+  }
+  
+  
+  .detail-text {
+    display: flex;
+    flex-direction: column; /* Label e valor empilhados */
+  }
+  
+  .detail-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.15rem;
+  }
+  
+  .detail-value {
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
