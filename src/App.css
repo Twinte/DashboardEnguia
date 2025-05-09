@@ -1,8 +1,6 @@
 /* src/App.css */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap'); /* Adicionado 700 bold */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 @import url('https://unpkg.com/leaflet/dist/leaflet.css');
-/* @import url('https://unpkg.com/leaflet-compass/dist/leaflet-compass.css'); - Se estiver usando */
-
 
 * {
   margin: 0;
@@ -10,45 +8,39 @@
   box-sizing: border-box;
 }
 
-/* Variáveis CSS são tipicamente definidas em index.css, mas podem estar aqui */
-/* :root { ... variáveis ... } */
-/* body.dark { ... variáveis ... } */
-
 body {
   font-family: 'Inter', sans-serif;
-  background: var(--background-primary); /* Usa variável */
-  color: var(--text-primary); /* Usa variável */
+  background: var(--background-primary);
+  color: var(--text-primary);
 }
 
-/* Main container */
 .dashboard-container {
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem; /* Reduzido padding se necessário */
+  padding: 1rem;
   background-color: var(--background-primary);
 }
 
-/* Top Bar */
 .top-bar {
   width: 100%;
-  background: var(--background-nav); /* Usa variável */
+  background: var(--background-nav);
   border-radius: 16px;
-  padding: 0.75rem 1.5rem; /* Ajuste padding se necessário */
+  padding: 0.75rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
-  color: var(--text-primary); /* Garante cor do texto */
+  color: var(--text-primary);
 }
 
 .top-left,
 .top-right {
   display: flex;
   align-items: center;
-  gap: 1rem; /* Espaço entre itens */
+  gap: 1rem;
 }
 
 .top-right .temperature,
@@ -57,7 +49,12 @@ body {
 .top-right .warnings {
   display: flex;
   align-items: center;
-  gap: 0.4rem; /* Espaço entre ícone e texto */
+  gap: 0.4rem;
+}
+.fetch-error-indicator { /* Para o ícone de erro na top-bar */
+  color: orange;
+  font-weight: bold;
+  margin-right: 0.5rem;
 }
 
 .top-center {
@@ -68,58 +65,58 @@ body {
 .warnings {
   display: flex;
   flex-direction: row;
-  gap: 0.5rem; /* Espaço entre ícones de aviso */
-  /* Removido margin-top se não necessário */
+  gap: 0.5rem;
 }
 
-
-/* Main Dash Panel */
 .main-dash {
-  flex: 1; /* Ocupa o espaço restante */
+  flex: 1;
   width: 100%;
   margin-bottom: 0.5rem;
-  background: var(--background-secondary); /* Usa variável */
+  background: var(--background-secondary);
   border-radius: 16px;
-  border: 2px solid var(--border-color); /* Usa variável */
+  border: 2px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem; /* Adiciona padding interno se necessário */
-  overflow: hidden; /* Evita que conteúdo grande saia */
+  padding: 1rem;
+  overflow: hidden;
 }
+.fetch-error-message { /* Para a mensagem de erro no main-dash */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-secondary);
+}
+.fetch-error-message p {
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+}
+
 
 .dash-content {
   display: flex;
   flex-direction: row;
-  align-items: center; /* Alinha verticalmente os wrappers */
-  justify-content: space-around; /* Distribui espaço entre colunas */
+  align-items: center;
+  justify-content: space-around;
   width: 100%;
-  gap: 2rem; /* Espaço entre as colunas principais */
+  gap: 2rem;
 }
 
-/* Gauge styling */
 .gauge-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center; /* Centraliza texto dentro do wrapper */
-  color: var(--text-primary); /* Garante cor do texto */
-  flex-basis: 30%; /* Define uma base para cada coluna */
-  max-width: 320px; /* Limita largura máxima */
+  text-align: center;
+  color: var(--text-primary);
+  flex-basis: 30%;
+  max-width: 320px;
 }
 
-/* Ajusta o tamanho do GaugeChart */
-/* É melhor usar a prop style no componente, como feito no JSX */
-/* .gauge-wrapper .react-gauge-chart {
-  width: 100% !important; 
-  max-width: 300px;
-  height: auto !important; 
-} */
-
-/* Label abaixo de cada gauge */
 .gauge-label {
-  margin-top: -1rem; /* Puxa um pouco para cima (ajuste!) */
-  position: relative; /* Permite ajuste fino */
+  margin-top: -1rem;
+  position: relative;
   text-align: center;
 }
 
@@ -127,7 +124,7 @@ body {
   font-size: 2.5rem;
   font-weight: 700;
   display: block;
-  line-height: 1; /* Evita altura extra */
+  line-height: 1;
 }
 
 .gauge-unit {
@@ -135,89 +132,100 @@ body {
   opacity: 0.8;
 }
 
-/* Barra de Bateria */
 .battery-bar {
-  margin-top: 1rem; /* Espaço acima da barra */
-  width: 150px; /* Largura da barra (ajuste) */
+  margin-top: 1rem;
+  width: 150px;
   text-align: center;
 }
 
 .battery-bar-title {
   font-weight: 600;
   font-size: 0.9rem;
-  display: flex; /* Para alinhar ícone e texto */
+  display: flex;
   align-items: center;
-  justify-content: center; /* Centraliza título */
+  justify-content: center;
   gap: 4px;
   margin-bottom: 0.3rem;
 }
 
 .battery-bar-track {
-  background: rgba(255, 255, 255, 0.2); /* Cor de fundo da barra */
+  background: rgba(255, 255, 255, 0.2);
   width: 100%;
-  height: 10px; /* Altura da barra */
-  border-radius: 5px; /* Bordas arredondadas */
+  height: 10px;
+  border-radius: 5px;
   position: relative;
-  overflow: hidden; /* Garante que o fill não ultrapasse */
+  overflow: hidden;
 }
 
 .battery-bar-fill {
-  background: var(--button-save-bg); /* Cor de preenchimento (verde) */
+  background: var(--button-save-bg);
   height: 100%;
   border-radius: 5px;
-  transition: width 0.5s ease; /* Animação suave */
+  transition: width 0.5s ease;
 }
 
 .battery-percentage-label {
-  display: block; /* Coloca em nova linha */
+  display: block;
   font-size: 0.8rem; 
   opacity: 0.8;
   margin-top: 0.25rem;
 }
 
-/* Wind speed display styles */
 .wind-speed-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  flex-basis: 30%; /* Define uma base para cada coluna */
-  max-width: 300px; /* Limita largura */
-  color: var(--text-primary); /* Garante cor do texto */
-}
-
-.wind-speed-display {
-  /* Estilos contidos no wrapper */
+  flex-basis: 30%;
+  max-width: 300px;
+  color: var(--text-primary);
 }
 
 .wind-speed-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem; /* Espaço entre ícone e label */
+  gap: 0.5rem;
 }
 
 .wind-speed-label {
   font-weight: 600;
-  font-size: 1.1rem; /* Tamanho do label */
+  font-size: 1.1rem;
 }
 
 .wind-speed-value {
   display: block;
-  font-size: 1.8rem; /* Tamanho do valor */
+  font-size: 1.8rem;
   font-weight: bold;
   margin-top: 0.5rem;
 }
 
-/* Bottom Nav Panel */
+.temperature-display { /* Adicionado para o display de temperatura na home */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.75rem;
+  color: var(--text-secondary);
+}
+.temperature-display svg {
+  font-size: 1.2rem;
+  margin-right: 0.4rem;
+  color: var(--text-primary);
+}
+.temperature-display span {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+
 .bottom-nav {
   width: 100%;
-  background: var(--background-nav); /* Usa variável */
+  background: var(--background-nav);
   border-radius: 16px;
-  padding: 0.5rem 0; /* Ajuste padding vertical */
+  padding: 0.5rem 0;
   display: flex;
-  justify-content: space-around; /* Espaça igualmente os itens */
+  justify-content: space-around;
   align-items: center;
 }
 
@@ -225,23 +233,22 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem; /* Espaço entre ícone e texto */
-  padding: 0.4rem 0.75rem; /* Padding interno */
+  gap: 0.25rem;
+  padding: 0.4rem 0.75rem;
   cursor: pointer;
   border-radius: 8px;
   transition: background 0.2s ease;
-  color: var(--text-secondary); /* Cor padrão do item */
+  color: var(--text-secondary);
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.1); /* Efeito hover */
-  color: var(--text-primary); /* Cor no hover */
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
 }
 
-.nav-item.active { /* Estilo para aba ativa */
-    color: var(--text-primary); /* Cor mais forte */
-    font-weight: 600; /* Negrito */
-    /* background: rgba(255, 255, 255, 0.1); /* Fundo sutil (opcional) */
+.nav-item.active {
+    color: var(--text-primary);
+    font-weight: 600;
 }
 
 .nav-item span {
@@ -253,17 +260,17 @@ body {
   display: flex;
   width: 100%;
   height: 100%;
-  background-color: var(--background-secondary); /* Fundo */
+  background-color: var(--background-secondary);
 }
 
 .navigation-map-left {
-  width: 40%; /* Coluna esquerda */
+  width: 40%;
   display: flex;
   flex-direction: column;
-  justify-content: space-around; /* Distribui espaço */
-  background-color: var(--background-secondary); /* Cor de fundo */
+  justify-content: space-around;
+  background-color: var(--background-secondary);
   padding: 1rem;
-  border-right: 1px solid var(--border-color); /* Linha divisória */
+  border-right: 1px solid var(--border-color);
   color: var(--text-primary);
 }
 
@@ -271,30 +278,28 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Tira a altura fixa para ser flexível */
 }
 
-.navigation-compass svg { /* Tamanho da bússola */
+.navigation-compass svg {
     width: 120px;
     height: 120px;
-    color: var(--text-primary); /* Cor da bússola */
+    color: var(--text-primary);
 }
 
 .navigation-metrics {
-  /* Tira a altura fixa */
   padding-top: 1rem;
 }
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Colunas responsivas */
-  grid-gap: 15px; /* Espaço entre métricas */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-gap: 15px;
 }
 
 .metric-item {
   display: flex;
   flex-direction: column;
-  background-color: var(--background-nav); /* Fundo sutil para cada métrica */
+  background-color: var(--background-nav);
   padding: 0.75rem;
   border-radius: 8px;
 }
@@ -311,42 +316,342 @@ body {
 }
 
 .navigation-map-leaflet {
-  width: 60%; /* Coluna direita */
+  width: 60%;
   height: 100%;
 }
 
 .leaflet-container {
   height: 100% !important;
   width: 100% !important;
-  border-radius: 0 16px 16px 0; /* Arredonda cantos se o map for o último elemento */
+  border-radius: 0 16px 16px 0;
 }
 
 
 /* ======================================================= */
-/* == NOVOS ESTILOS PARA AJUSTAR A EXIBIÇÃO DA TEMPERATURA == */
+/* ============== ESTILOS RESPONSIVOS ==================== */
 /* ======================================================= */
 
-/* Estilos para o container da Temperatura abaixo do RPM */
-.temperature-display {
-  display: flex; /* Alinha o ícone e o texto na horizontal */
-  align-items: center; /* Alinha verticalmente ao centro */
-  justify-content: center; /* Centraliza horizontalmente (opcional) */
-  margin-top: 0.75rem; /* Espaço acima, ajuste conforme necessário */
-  color: var(--text-secondary); /* Usa a variável de cor secundária */
+/* Para Tablets e ecrãs menores (ex: abaixo de 992px) */
+@media (max-width: 992px) {
+  .dash-content {
+    flex-direction: column; 
+    align-items: center; 
+    gap: 2rem; 
+  }
+
+  .gauge-wrapper,
+  .wind-speed-wrapper {
+    flex-basis: auto; 
+    width: 80%;      
+    max-width: 400px; 
+    margin-bottom: 1rem; 
+  }
+
+  .navigation-map-container {
+    flex-direction: column; 
+  }
+  .navigation-map-left, 
+  .navigation-map-leaflet {
+    width: 100%; 
+  }
+  .navigation-map-left {
+    max-height: 40vh; 
+    overflow-y: auto;
+    margin-bottom: 1rem;
+  }
+  .metrics-grid {
+     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
+  }
+
+  .settings-page {
+    flex-direction: column; 
+  }
+  .settings-sidebar, 
+  .settings-content {
+    width: 100%; 
+  }
+  .settings-sidebar {
+    border-right: none;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 1rem;
+    max-height: 200px; 
+    overflow-y: auto;
+  }
+  .settings-sidebar ul {
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+  }
+  .settings-sidebar li {
+    padding: 8px 12px;
+  }
 }
 
-/* Estilos para o ÍCONE de temperatura (SVG) */
-.temperature-display svg {
-  font-size: 1.2rem; /* Controla o tamanho do ícone (ajuste!) */
-  /* Ou use width/height se font-size não funcionar bem: */
-  /* width: 20px; */
-  /* height: 20px; */
-  margin-right: 0.4rem; /* Espaço entre o ícone e o texto */
-  color: var(--text-primary); /* Garante que o ícone use a cor primária do texto */
+/* Para Telemóveis (ex: abaixo de 600px) */
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 0.5rem; 
+  }
+
+  .top-bar {
+    padding: 0.5rem 0.75rem;
+  }
+  .top-left, .top-center, .top-right {
+    font-size: 0.9rem; 
+  }
+  .top-right {
+    gap: 0.5rem; 
+  }
+  .top-right .temperature svg,
+  .top-right .battery-level svg,
+  .top-right .wifi-status svg,
+  .top-right .warnings svg {
+    font-size: 1rem; 
+  }
+
+  .main-dash {
+    padding: 0.75rem; 
+  }
+
+  .gauge-wrapper,
+  .wind-speed-wrapper {
+    width: 95%;      
+    max-width: 320px; 
+  }
+
+  .gauge-value {
+    font-size: 2rem; 
+  }
+  .gauge-unit {
+    font-size: 0.8rem;
+  }
+
+  .wind-speed-value {
+    font-size: 1.5rem;
+  }
+  .wind-speed-label {
+    font-size: 1rem;
+  }
+  .wind-speed-header svg {
+    width: 24px; 
+    height: 24px;
+  }
+
+  .bottom-nav {
+    padding: 0.3rem 0;
+  }
+  .nav-item {
+    padding: 0.3rem 0.5rem;
+  }
+  .nav-item svg {
+    font-size: 18px; 
+  }
+  .nav-item span {
+    font-size: 0.7rem; 
+  }
+
+  /* PowerPage específica para mobile */
+  .power-page-container { /* Assegurar que PowerPage.css não sobrescreva isto sem querer */
+    padding: 1rem;
+  }
+  .power-percentage-label .value {
+    font-size: 2.2rem; 
+  }
+  .power-details { /* Assegurar que PowerPage.css não sobrescreva isto sem querer */
+    grid-template-columns: 1fr; 
+    gap: 1rem;
+  }
+  .detail-value { /* Assegurar que PowerPage.css não sobrescreva isto sem querer */
+    font-size: 1.1rem; 
+  }
+
+  /* Settings Page específica para mobile */
+  .settings-sidebar ul { /* Assegurar que SettingsPage.css não sobrescreva isto sem querer */
+    flex-direction: column; 
+    align-items: stretch; 
+  }
+  .settings-sidebar li { /* Assegurar que SettingsPage.css não sobrescreva isto sem querer */
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .settings-sidebar li:last-child {
+    border-bottom: none;
+  }
+  .settings-sidebar .user-profile {
+    padding-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .settings-sidebar .user-profile svg {
+    width: 35px; height: 35px; 
+  }
+  .action-buttons { /* Assegurar que SettingsPage.css não sobrescreva isto sem querer */
+    justify-content: center; 
+  }
 }
 
-/* Estilos para o TEXTO da temperatura */
-.temperature-display span {
-  font-size: 0.9rem; /* Tamanho da fonte do texto (ajuste!) */
-  font-weight: 500; /* Peso da fonte (opcional) */
+
+/* ==================================================================== */
+/* === AJUSTES ESPECÍFICOS PARA TELEMÓVEIS EM PAISAGEM (LANDSCAPE) === */
+/* ==================================================================== */
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+  .main-dash {
+    padding: 0.5rem; 
+    overflow-y: auto; 
+  }
+
+  /* === Aba Home (Paisagem Mobile) === */
+  .dash-content {
+    flex-direction: row;    
+    flex-wrap: nowrap;      
+    justify-content: space-around; 
+    align-items: center;  
+    gap: 0.5rem;            
+    width: 100%;
+    height: 100%; 
+  }
+
+  .gauge-wrapper,
+  .wind-speed-wrapper {
+    flex-basis: 30%;    
+    flex-grow: 1;       
+    flex-shrink: 1;     
+    width: auto;        
+    max-width: 180px;   
+    margin-bottom: 0;   
+    padding: 0.25rem;   
+    height: 100%;       
+    display: flex;      
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+  }
+  
+  .gauge-wrapper .react-gauge-chart svg {
+      max-width: 100% !important; 
+      max-height: 120px !important; 
+      width: auto !important;
+      height: auto !important;
+  }
+
+  .gauge-value { font-size: 1.5rem; margin-top: -0.5rem; }
+  .gauge-unit { font-size: 0.6rem; }
+  .battery-bar { width: 80%; margin-top: 0.25rem; }
+  .battery-bar-title { font-size: 0.6rem; }
+  .battery-bar-track { height: 6px; }
+  .battery-percentage-label { font-size: 0.6rem; }
+  .wind-speed-header svg { width: 20px; height: 20px; }
+  .wind-speed-label { font-size: 0.7rem; }
+  .wind-speed-value { font-size: 1.4rem; margin-top: 0.1rem; }
+  .temperature-display { margin-top: 0.25rem; }
+  .temperature-display svg { font-size: 0.7rem; }
+  .temperature-display span { font-size: 0.65rem; }
+
+  /* === AJUSTES PARA ABA ROTA (NavigationMap - Paisagem Mobile) === */
+  .navigation-map-container {
+    flex-direction: row;    
+    align-items: stretch;   
+    height: 100%;          
+    width: 100%;
+  }
+
+  .navigation-map-left { 
+    width: 35%;           
+    max-width: 180px;     
+    height: 100%;         
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around; 
+    overflow-y: auto;     
+    border-right: 1px solid var(--border-color); 
+    border-bottom: none;  
+  }
+
+  .navigation-compass {
+    width: 100%; 
+  }
+  .navigation-compass svg {
+    max-width: 80px;  
+    max-height: 80px; 
+    width: 100%;      
+    height: auto;
+  }
+
+  .navigation-metrics {
+    width: 100%; 
+    padding-top: 0.5rem;
+  }
+  .metrics-grid {
+    grid-template-columns: 1fr; 
+    gap: 0.5rem; 
+  }
+  .metric-item {
+    padding: 0.3rem 0.5rem; 
+  }
+  .metric-label { font-size: 0.65rem; }
+  .metric-value { font-size: 0.85rem; }
+
+  .navigation-map-leaflet { 
+    width: 65%;       
+    height: 100%;     
+  }
+  .leaflet-control-zoom { 
+    transform: scale(0.8);
+    transform-origin: top left;
+  }
+
+  /* === AJUSTES PARA ABA DEFINIÇÕES (SettingsPage - Paisagem Mobile) === */
+  .settings-page {
+    flex-direction: row; 
+    align-items: stretch; 
+    height: 100%;
+    width: 100%;
+  }
+
+  .settings-sidebar {
+    width: 30%;        
+    max-width: 160px;  
+    height: 100%;      
+    overflow-y: auto;  
+    border-right: 1px solid var(--border-color); 
+    border-bottom: none; 
+    padding: 0.5rem;
+    margin-bottom: 0; 
+  }
+  .settings-sidebar .sidebar-title { font-size: 1rem; margin-bottom: 0.5rem; }
+  .settings-sidebar ul { flex-direction: column; align-items: stretch; }
+  .settings-sidebar li { padding: 0.4rem 0.5rem; font-size: 0.8rem; }
+  .settings-sidebar .user-profile { padding-top: 0.5rem; }
+  .settings-sidebar .user-profile svg { width: 30px; height: 30px; }
+  .settings-sidebar .user-name { font-size: 0.8rem; }
+  .settings-sidebar .user-email { font-size: 0.65rem; }
+
+  .settings-content {
+    width: 70%;       
+    height: 100%;
+    overflow-y: auto; 
+    padding: 0.75rem;
+  }
+  .settings-content h2 { font-size: 1.1rem; margin-bottom: 0.75rem; }
+  .setting-item { padding: 0.6rem; margin-bottom: 0.6rem; }
+  .setting-item h3 { font-size: 0.9rem; }
+  .setting-item p { font-size: 0.75rem; }
+  .setting-item input,
+  .setting-item select { padding: 4px; font-size: 0.8rem; margin-top: 5px; }
+  .action-buttons { margin-top: 0.75rem; gap: 5px; }
+  .action-buttons button { padding: 5px 10px; font-size: 0.8rem; }
+
+
+  /* Ajustes na barra superior e inferior para economizar espaço vertical */
+  .top-bar { padding: 0.25rem 0.5rem; min-height: auto; }
+  .top-left, .top-center, .top-right { font-size: 0.8rem; gap: 0.3rem; }
+  .top-right .temperature svg,
+  .top-right .battery-level svg,
+  .top-right .wifi-status svg,
+  .top-right .warnings svg { font-size: 0.9rem; }
+
+  .bottom-nav { padding: 0.15rem 0; min-height: auto; }
+  .nav-item { padding: 0.2rem 0.3rem; }
+  .nav-item svg { font-size: 16px; }
+  .nav-item span { font-size: 0.6rem; /* display: none; */ }
 }

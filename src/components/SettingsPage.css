@@ -144,3 +144,25 @@
 .action-buttons .save-btn:hover {
   background-color: #27ae60;
 }
+
+@media (max-width: 992px) {
+  /* A sidebar já está sendo tratada no App.css para este breakpoint, 
+     mas podes adicionar mais especificidades aqui se necessário. */
+  .settings-content {
+    padding-top: 1rem; /* Adiciona espaço se a sidebar estiver horizontal */
+  }
+}
+
+@media (max-width: 600px) {
+  .settings-sidebar {
+    /* Aqui poderias, por exemplo, esconder a sidebar e mostrar um botão "Menu" */
+    /* display: none; */ 
+    /* E no App.jsx, ter um estado para controlar a visibilidade da sidebar no mobile */
+  }
+  .setting-item {
+    padding: 10px; /* Menos padding nos itens de configuração */
+  }
+  .setting-item h3 {
+    font-size: 1rem; /* Fonte menor para títulos de configuração */
+  }
+}
