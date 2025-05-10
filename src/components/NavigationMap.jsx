@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet"
 import { useMapEvent } from "react-leaflet"; // Import para capturar eventos no Mapa
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { FaCompass } from "react-icons/fa";
+import { FaCompass, FaCaretUp } from "react-icons/fa";
 import RecenterMap from "./RecenterMap";
 
 // Função para capturar o Clique direteamente no Mapa
@@ -97,9 +97,18 @@ const NavigationMap = ({ heading }) => {
   return (
     <div className="navigation-map-container">
       <div className="navigation-map-left">
-        <div className="navigation-compass">
-          <div style={{ transform: `rotate(${heading}deg)` }}>
-            <FaCompass size={100} color="#fff" />
+        <div className="navigation-compass-container"> {/* Novo container para posicionamento */}
+          <div className="lubber-line">
+            <FaCaretUp size={24} color="var(--text-primary)" /> {/* Ou uma div estilizada */}
+          </div>
+          <div 
+            className="compass-rose" 
+            style={{ transform: `rotate(${(360 - heading) % 360}deg)` }}
+          >
+            <FaCompass size={100} color="var(--text-primary)" /> {/* Usar variável de cor */}
+          </div>
+          <div className="heading-value-display">
+            {heading.toFixed(0)}°
           </div>
         </div>
         <div className="navigation-metrics">
