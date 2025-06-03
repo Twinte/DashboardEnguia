@@ -1,36 +1,42 @@
-import { StrictMode } from 'react';
+// src/main.jsx
+import React, { StrictMode, Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
 
-// 1. Importar estilos globais (incluindo variáveis de tema)
-import './index.css'; 
-
-// 2. Importar e inicializar a configuração do i18next
-//    Certifique-se que o ficheiro 'src/i18n.js' existe e está configurado
-//    como mostrado no Passo 3. A simples importação executa a inicialização.
+import './index.css'; //
 import './i18n'; 
-
-// 3. Importar o componente principal da aplicação
-import App from './App.jsx';
-
-// 4. Importar o Provedor do Contexto de Configurações
-//    Certifique-se que o ficheiro 'src/context/SettingsContext.js' existe
-//    e está criado como mostrado no Passo 4.
 import { SettingsProvider } from './context/SettingsContext'; 
+import LoadingScreen from './components/LoadingScreen'; 
 
-// 5. Obter o elemento root do HTML
+// Defina o tempo mínimo que a tela de carregamento deve ser exibida (em milissegundos)
+const MINIMUM_LOADING_TIME_MS = 5000; // Exemplo: 2.5 segundos
+
+// Carregar o componente App de forma "preguiçosa" (lazy loading)
+// com uma garantia de tempo mínimo de exibição da tela de carregamento
+const App = lazy(() => {
+  // Cria duas promessas:
+  // 1. A importação real do componente App
+  const importPromise = import('./App.jsx'); //
+  // 2. Uma promessa que só resolve após o tempo mínimo
+  const timeoutPromise = new Promise(resolve => setTimeout(resolve, MINIMUM_LOADING_TIME_MS));
+
+  // Promise.all espera que ambas as promessas sejam resolvidas
+  return Promise.all([importPromise, timeoutPromise])
+    .then(([moduleExports]) => {
+      // moduleExports é o resultado da primeira promessa (importPromise)
+      // Retornamos o módulo que contém o componente App
+      return moduleExports; 
+    });
+});
+
 const rootElement = document.getElementById('root');
-
-// 6. Criar a raiz do React
 const root = createRoot(rootElement);
 
-// 7. Renderizar a aplicação
 root.render(
   <StrictMode>
-    {/* 8. Envolver toda a aplicação com o SettingsProvider */}
-    {/* Isto disponibiliza o contexto (tema, idioma) para todos os */}
-    {/* componentes descendentes, incluindo o App. */}
     <SettingsProvider>
-      <App /> 
+      <Suspense fallback={<LoadingScreen />}>
+        <App /> 
+      </Suspense>
     </SettingsProvider>
   </StrictMode>,
 );

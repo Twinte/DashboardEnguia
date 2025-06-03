@@ -6,73 +6,84 @@
 }
 
 .settings-sidebar {
-  width: 20%; /* Sidebar width */
-  background-color: #1d2b3a;
-  color: white;
+  width: 20%; /* Largura da Sidebar */
+  background-color: var(--background-nav); /* Usar variável de tema */
+  color: var(--text-primary); /* Usar variável de tema */
   padding: 1rem;
-  border-right: 2px solid rgba(255, 255, 255, 0.1);
+  border-right: 2px solid var(--border-color); /* Usar variável de tema */
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Push user profile to the bottom */
+  justify-content: space-between; /* Empurra a secção da logo para o fundo */
 }
 
 .sidebar-title {
   font-size: 1.5rem;
   margin-bottom: 1rem;
+  color: var(--text-primary); /* Garante a cor do título */
 }
 
 .settings-sidebar ul {
   list-style-type: none;
   padding: 0;
+  margin: 0; /* Garante que não haja margem padrão na lista */
 }
 
 .settings-sidebar li {
-  padding: 10px;
+  padding: 10px 15px; /* Ajuste o padding se necessário */
   cursor: pointer;
   transition: background-color 0.3s ease;
   font-size: 1.1rem;
+  border-radius: 6px; /* Bordas arredondadas para itens da lista */
+  margin-bottom: 0.25rem; /* Pequeno espaço entre itens */
+  color: var(--text-secondary); /* Cor para itens não ativos */
 }
 
-.settings-sidebar li:hover,
+.settings-sidebar li:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Usar cor sutil do tema */
+  color: var(--text-primary);
+}
 .settings-sidebar li.active {
-  background-color: #324756;
+  background-color: var(--button-bg); /* Cor de destaque do tema */
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
-.user-profile {
+/* Estilo para a secção que contém a logo (antigo .user-profile) */
+.logo-profile-section { /* Ou .user-profile se manteve o nome da classe no JSX */
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding-top: 1rem;
-  margin-bottom: 1rem;
-  text-align: center;  /* Center the profile info */
+  align-items: center; /* Centraliza a logo horizontalmente */
+  justify-content: center; /* Centraliza a logo verticalmente na sua secção */
+  padding: 1rem 0; /* Espaçamento vertical, sem padding lateral para não limitar a largura da imagem */
+  /* margin-top: auto;  Removido, pois justify-content: space-between no pai deve cuidar disso */
 }
 
-.user-profile .user-info {
-  display: flex;
-  flex-direction: column;  /* Stack name and email vertically */
-  align-items: center;
+/* Estilo para a imagem da logo */
+.sidebar-logo {
+  max-width: 80%;   /* A logo ocupará no máximo 80% da largura da sidebar */
+  max-height: 100px; /* Defina uma altura máxima para a logo. AJUSTE ESTE VALOR! */
+  height: auto;      /* Mantém a proporção da imagem */
+  object-fit: contain; /* Garante que a imagem inteira seja visível, sem cortar */
 }
 
-.user-name {
-  font-weight: bold;
-  font-size: 1rem;
-  margin-bottom: 0.25rem;  /* Add space between name and email */
-}
+/* Estilos anteriores para .user-profile, .user-name, .user-email foram removidos ou comentados */
+/* .user-profile { ... } */
+/* .user-name { ... } */
+/* .user-email { ... } */
 
-.user-email {
-  font-size: 0.8rem;
-  opacity: 0.8;
-}
 
 .settings-content {
-  width: 80%; /* Main content area takes the remaining 80% */
-  padding: 1rem;
-  background-color: #0f2c42;
-  color: white;
+  width: 80%; /* Área de conteúdo principal */
+  padding: 1.5rem; /* Mais padding para o conteúdo */
+  background-color: var(--background-secondary); /* Usar variável de tema */
+  color: var(--text-primary); /* Usar variável de tema */
+  overflow-y: auto; /* Scroll para conteúdo extenso */
 }
 
 .settings-content h2 {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem; /* Mais espaço abaixo do título da secção */
+  border-bottom: 1px solid var(--border-color); /* Linha divisória sutil */
+  padding-bottom: 0.75rem;
 }
 
 .settings-list {
@@ -80,89 +91,232 @@
 }
 
 .setting-item {
-  margin-bottom: 1rem;
-  padding: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 1.25rem; /* Mais espaço entre itens de configuração */
+  padding: 1rem; /* Padding interno para cada item */
+  border: 1px solid var(--border-color); /* Usar variável de tema */
   border-radius: 8px;
-  background-color: #1c3348;
+  background-color: var(--background-nav); /* Usar variável de tema, mais escura que o fundo do content */
   transition: background-color 0.3s ease;
 }
 
 .setting-item:hover {
-  background-color: #324756;
+  background-color: rgba(255, 255, 255, 0.05); /* Efeito hover sutil */
 }
 
 .setting-item h3 {
-  margin: 0;
+  margin: 0 0 0.5rem 0; /* Espaço abaixo do título do setting */
+  font-size: 1.1rem;
 }
 
 .setting-item p {
   font-size: 0.9rem;
-  opacity: 0.7;
+  opacity: 0.8; /* Texto de descrição um pouco mais suave */
+  margin-bottom: 0.75rem; /* Espaço antes do input/select */
 }
 
-.setting-item input,
+.setting-item input[type="text"],
+.setting-item input[type="password"],
+.setting-item input[type="number"],
+.setting-item input[type="color"],
 .setting-item select {
-  margin-top: 10px;
-  padding: 5px;
-  background-color: #324756;
-  color: white;
-  border: none;
+  margin-top: 5px; /* Reduzido, pois já há margem no <p> */
+  padding: 8px 10px; /* Padding confortável */
+  background-color: var(--background-primary); /* Fundo claro para contraste */
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   border-radius: 5px;
+  width: 100%; /* Ocupar largura total disponível */
+  max-width: 300px; /* Limitar largura máxima para inputs/selects */
+  box-sizing: border-box;
+}
+.setting-item input[type="color"] {
+  padding: 2px; /* Padding menor para input de cor */
+  height: 40px; /* Altura para input de cor */
+  max-width: 100px; /* Largura menor para input de cor */
 }
 
-.setting-item input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+
+.setting-item input[type="checkbox"].toggle-switch {
+  /* Estilos para um switch (se quiser implementar visualmente) */
+  /* Por agora, é um checkbox normal */
+  width: auto; /* Checkbox não ocupa largura total */
+  max-width: none;
+  margin-right: 0.5rem;
+  vertical-align: middle;
 }
 
 .action-buttons {
   margin-top: 20px;
   display: flex;
-  justify-content: flex-end; /* Align buttons to the right */
+  justify-content: flex-end; /* Alinhar botões à direita */
   gap: 10px;
 }
 
 .action-buttons button {
-  background-color: #324756;
-  color: white;
-  border: none;
+  background-color: var(--button-bg); /* Usar variável de tema */
+  color: var(--text-primary); /* Usar variável de tema */
+  border: 1px solid var(--border-color); /* Adicionar uma borda sutil */
   padding: 10px 20px;
   cursor: pointer;
   border-radius: 8px;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  font-weight: 500;
 }
 
 .action-buttons button:hover {
-  background-color: #2a3a4b;
+  background-color: var(--button-hover-bg); /* Usar variável de tema */
+  border-color: var(--text-secondary);
 }
 
 .action-buttons .save-btn {
-  background-color: #2ecc71;
+  background-color: var(--button-save-bg); /* Usar variável de tema */
+  border-color: var(--button-save-bg);
+  color: #fff; /* Texto branco para botões de salvar */
 }
 
 .action-buttons .save-btn:hover {
-  background-color: #27ae60;
+  background-color: var(--button-save-hover-bg); /* Usar variável de tema */
+  border-color: var(--button-save-hover-bg);
 }
 
+
+/* ======================================================= */
+/* ======== ESTILOS RESPONSIVOS PARA SETTINGS PAGE ======== */
+/* ======================================================= */
+
+/* Mantém os estilos responsivos que já tínhamos em App.css para .settings-page e .settings-sidebar,
+   mas aqui podemos refinar APENAS os estilos INTERNOS de SettingsPage.css se necessário.
+   Se os estilos em App.css forem suficientes, esta secção pode ser menor.
+*/
+
 @media (max-width: 992px) {
-  /* A sidebar já está sendo tratada no App.css para este breakpoint, 
-     mas podes adicionar mais especificidades aqui se necessário. */
+  /* Em App.css, .settings-page já se torna flex-direction: column */
+  /* Em App.css, .settings-sidebar e .settings-content já se tornam width: 100% */
+  
+  .settings-sidebar {
+    max-height: none; /* Permitir que a sidebar cresça no modo tablet empilhado */
+    /* justify-content: flex-start; /* Remover se usava space-between para empurrar logo */
+  }
+  .logo-profile-section {
+    /* Ajustar margem se o justify-content: space-between foi removido da sidebar */
+    margin-top: 1rem; /* Adicionar um pouco de espaço acima da logo */
+    padding-bottom: 0; /* Remover padding inferior se não houver mais nada abaixo */
+  }
+  .sidebar-logo {
+    max-height: 80px; /* Logo um pouco menor em tablet */
+  }
+
   .settings-content {
-    padding-top: 1rem; /* Adiciona espaço se a sidebar estiver horizontal */
+    padding: 1rem; /* Menos padding no conteúdo em tablet */
+  }
+  .settings-content h2 {
+    font-size: 1.3rem;
   }
 }
 
 @media (max-width: 600px) {
-  .settings-sidebar {
-    /* Aqui poderias, por exemplo, esconder a sidebar e mostrar um botão "Menu" */
-    /* display: none; */ 
-    /* E no App.jsx, ter um estado para controlar a visibilidade da sidebar no mobile */
+  /* Em App.css, .settings-sidebar ul já se torna flex-direction: column */
+
+  .sidebar-title {
+    font-size: 1.3rem; /* Título da sidebar menor */
+  }
+  .settings-sidebar li {
+    font-size: 1rem; /* Itens da lista menores */
+    padding: 8px 10px;
+  }
+  .logo-profile-section {
+    padding: 0.5rem 0;
+  }
+  .sidebar-logo {
+    max-height: 60px; /* Logo ainda menor em mobile */
+  }
+
+  .settings-content {
+    padding: 0.75rem;
+  }
+  .settings-content h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
   }
   .setting-item {
-    padding: 10px; /* Menos padding nos itens de configuração */
+    padding: 0.75rem;
+    margin-bottom: 1rem;
   }
   .setting-item h3 {
-    font-size: 1rem; /* Fonte menor para títulos de configuração */
+    font-size: 1rem;
+  }
+  .setting-item p {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+  .setting-item input[type="text"],
+  .setting-item input[type="password"],
+  .setting-item input[type="number"],
+  .setting-item input[type="color"],
+  .setting-item select {
+    padding: 6px 8px;
+    font-size: 0.9rem;
+  }
+  .action-buttons {
+    flex-direction: column; /* Empilhar botões em mobile */
+    gap: 8px;
+  }
+  .action-buttons button {
+    width: 100%; /* Botões ocupam largura total */
+  }
+}
+
+/* Ajustes para TELEMÓVEIS EM PAISAGEM (landscape) dentro de SettingsPage.css */
+/* Se os ajustes em App.css não forem suficientes */
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+  /* Em App.css, .settings-page já se torna flex-direction: row */
+  /* Em App.css, .settings-sidebar e .settings-content já têm larguras ajustadas */
+
+  .settings-sidebar {
+    padding: 0.5rem; /* Menos padding na sidebar em paisagem mobile */
+    justify-content: flex-start; /* Alinhar itens ao topo, já que a logo ficará visível */
+  }
+  .sidebar-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .settings-sidebar li {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.4rem;
+  }
+  .logo-profile-section {
+    padding: 0.5rem 0 0 0; /* Sem padding inferior, só superior */
+    margin-top: auto; /* Tentar empurrar para baixo */
+  }
+  .sidebar-logo {
+    max-height: 50px; /* Logo bem pequena */
+  }
+
+  .settings-content {
+    padding: 0.5rem 0.75rem; /* Menos padding no conteúdo */
+  }
+  .settings-content h2 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.3rem;
+  }
+  .setting-item {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .setting-item h3 {
+    font-size: 0.85rem;
+  }
+  .setting-item p {
+    font-size: 0.7rem;
+    margin-bottom: 0.3rem;
+  }
+  .action-buttons {
+    margin-top: 0.5rem;
+  }
+  .action-buttons button {
+    padding: 4px 8px;
+    font-size: 0.75rem;
   }
 }
