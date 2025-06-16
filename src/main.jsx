@@ -1,42 +1,37 @@
 // src/main.jsx
-import React, { StrictMode, Suspense, lazy } from 'react';
+// Data da Modificação: 16 de junho de 2025
+
+// Não precisamos mais de Suspense ou lazy aqui
+import React, { StrictMode } from 'react'; 
 import { createRoot } from 'react-dom/client';
 
-import './index.css'; //
+// Importar estilos globais
+import './index.css';
+
+// Importar a configuração do i18next (para traduções)
 import './i18n'; 
+
+// Importar o provedor de contexto para tema e idioma
 import { SettingsProvider } from './context/SettingsContext'; 
-import LoadingScreen from './components/LoadingScreen'; 
 
-// Defina o tempo mínimo que a tela de carregamento deve ser exibida (em milissegundos)
-const MINIMUM_LOADING_TIME_MS = 5000; // Exemplo: 2.5 segundos
+// Importar o nosso novo componente inicializador, que agora controla o fluxo de carregamento
+import AppInitializer from './components/AppInitializer';
 
-// Carregar o componente App de forma "preguiçosa" (lazy loading)
-// com uma garantia de tempo mínimo de exibição da tela de carregamento
-const App = lazy(() => {
-  // Cria duas promessas:
-  // 1. A importação real do componente App
-  const importPromise = import('./App.jsx'); //
-  // 2. Uma promessa que só resolve após o tempo mínimo
-  const timeoutPromise = new Promise(resolve => setTimeout(resolve, MINIMUM_LOADING_TIME_MS));
-
-  // Promise.all espera que ambas as promessas sejam resolvidas
-  return Promise.all([importPromise, timeoutPromise])
-    .then(([moduleExports]) => {
-      // moduleExports é o resultado da primeira promessa (importPromise)
-      // Retornamos o módulo que contém o componente App
-      return moduleExports; 
-    });
-});
-
+// Obter o elemento root do HTML
 const rootElement = document.getElementById('root');
+
+// Criar a raiz do React para renderização
 const root = createRoot(rootElement);
 
+// Renderizar a aplicação
 root.render(
   <StrictMode>
     <SettingsProvider>
-      <Suspense fallback={<LoadingScreen />}>
-        <App /> 
-      </Suspense>
+      {/* Renderiza apenas o AppInitializer. 
+        Este componente agora tem a responsabilidade de mostrar a tela de carregamento (SponsorsScreen) 
+        e, quando terminar, renderizar a aplicação principal (App).
+      */}
+      <AppInitializer />
     </SettingsProvider>
   </StrictMode>,
 );

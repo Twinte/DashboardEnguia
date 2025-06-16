@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { useSettings } from '../context/SettingsContext';
 // Importar a logo
-import logoNorteEnergia from '../assets/norte_energia_logo.png'; 
+import logoNorteEnergia from '../assets/logos/norteenergia.svg'; 
 import "./SettingsPage.css";
 
 const availableLanguages = [
