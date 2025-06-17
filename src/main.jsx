@@ -1,37 +1,28 @@
 // src/main.jsx
-// Data da Modificação: 16 de junho de 2025
-
-// Não precisamos mais de Suspense ou lazy aqui
-import React, { StrictMode } from 'react'; 
+import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+// 1. Importar o BrowserRouter
+import { BrowserRouter } from 'react-router-dom';
 
-// Importar estilos globais
 import './index.css';
+import './i18n';
 
-// Importar a configuração do i18next (para traduções)
-import './i18n'; 
-
-// Importar o provedor de contexto para tema e idioma
-import { SettingsProvider } from './context/SettingsContext'; 
-
-// Importar o nosso novo componente inicializador, que agora controla o fluxo de carregamento
+import { SettingsProvider } from './context/SettingsContext';
+import { SensorDataProvider } from './context/SensorDataContext';
 import AppInitializer from './components/AppInitializer';
 
-// Obter o elemento root do HTML
 const rootElement = document.getElementById('root');
-
-// Criar a raiz do React para renderização
 const root = createRoot(rootElement);
 
-// Renderizar a aplicação
 root.render(
   <StrictMode>
-    <SettingsProvider>
-      {/* Renderiza apenas o AppInitializer. 
-        Este componente agora tem a responsabilidade de mostrar a tela de carregamento (SponsorsScreen) 
-        e, quando terminar, renderizar a aplicação principal (App).
-      */}
-      <AppInitializer />
-    </SettingsProvider>
+    {/* 2. Envolver a aplicação com o BrowserRouter */}
+    <BrowserRouter>
+      <SettingsProvider>
+        <SensorDataProvider>
+          <AppInitializer />
+        </SensorDataProvider>
+      </SettingsProvider>
+    </BrowserRouter>
   </StrictMode>,
 );
