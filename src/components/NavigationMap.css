@@ -1,0 +1,103 @@
+/* src/components/NavigationMap.css */
+
+/* Estilos para o planejador de rotas na barra lateral */
+.route-planner {
+  background-color: var(--background-nav);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.route-planner h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.waypoints-list {
+  max-height: 150px; /* Limita a altura da lista */
+  overflow-y: auto; /* Adiciona scroll se a lista for longa */
+  margin-bottom: 1rem;
+  padding-right: 5px; /* Espaço para a barra de scroll */
+}
+
+.empty-message {
+  color: var(--text-secondary);
+  font-style: italic;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.waypoint-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.waypoint-item .remove-btn {
+  background: none;
+  border: none;
+  color: #e74c3c; /* Vermelho para perigo */
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.waypoint-item .remove-btn:hover {
+  color: #c0392b;
+}
+
+.route-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.route-actions .action-btn {
+  flex-grow: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.route-actions .start-btn {
+  background-color: var(--button-save-bg);
+  color: white;
+}
+.route-actions .start-btn:hover {
+  background-color: var(--button-save-hover-bg);
+}
+
+.route-actions .clear-btn {
+  background-color: #c0392b;
+  color: white;
+}
+.route-actions .clear-btn:hover {
+  background-color: #a02b1c;
+}
+
+/* Estilos para o valor de "Rota Possível" */
+.metric-value.possible {
+  color: #2ecc71; /* Verde */
+}
+.metric-value.impossible {
+  color: #e74c3c; /* Vermelho */
+}
+
+/* Estilos para customizar o Leaflet Routing Machine */
+.leaflet-routing-container {
+  display: none; /* Esconde completamente o painel de direções padrão */
+}
