@@ -1,103 +1,82 @@
 // src/components/NavigationMap.jsx
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvent } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMapEvent, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
-import { FaCompass, FaCaretUp, FaTrash } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import RecenterMap from "./RecenterMap";
 import RoutingMachine from "./RoutingMachine";
+import BoatMarker from "./BoatMarker"; // 1. Importar o novo marcador
 import { useSensorData } from "../context/SensorDataContext";
-import { useTrip } from "../context/TripContext"; // 1. Importar o hook do TripContext
+import { useTrip } from "../context/TripContext";
 import './NavigationMap.css';
 
 function MapClickHandler({ onClick, isTripActive }) {
   const map = useMapEvent("click", (e) => {
-    if (!isTripActive) { // Só permite cliques se a viagem não estiver ativa
-      onClick(e);
-    }
+    if (!isTripActive) onClick(e);
   });
-
-  // Muda o cursor do mapa com base no estado da viagem
   useEffect(() => {
     const mapContainer = map.getContainer();
-    if (isTripActive) {
-      mapContainer.style.cursor = 'not-allowed';
-    } else {
-      mapContainer.style.cursor = '';
-    }
+    mapContainer.style.cursor = isTripActive ? 'not-allowed' : '';
   }, [map, isTripActive]);
-  
   return null;
 }
 
 const NavigationMap = () => {
   const { sensorData } = useSensorData();
-  const { heading, lat, lng, batteryPercentage } = sensorData;
+  const { heading, lat, lng, batteryPercentage, speedKPH } = sensorData;
   
-  // 2. Consumir tudo relacionado à rota do TripContext
   const {
-    waypoints,
-    isTripActive,
-    addWaypoint,
-    removeWaypoint,
-    clearRoute,
-    startTrip,
-    endTrip
+    waypoints, isTripActive, traveledPath, distanceTraveled,
+    addWaypoint, removeWaypoint, clearRoute, startTrip, endTrip
   } = useTrip();
 
   const [mapZoom] = useState(12);
   const [routeSummary, setRouteSummary] = useState(null);
   const [eta, setEta] = useState(0);
-  const [batteryConsumption, setBatteryConsumption] = useState(0);
-  const [isRoutePossible, setIsRoutePossible] = useState(true);
 
-  const handleRouteFound = (summary) => {
-    setRouteSummary(summary);
-  };
+  const handleRouteFound = (summary) => setRouteSummary(summary);
   
   useEffect(() => {
     if (!routeSummary) {
       setEta(0);
-      setBatteryConsumption(0);
-      setIsRoutePossible(true);
       return;
     }
-    const distanceInKm = routeSummary.totalDistance / 1000;
-    const timeInHours = routeSummary.totalTime / 3600;
-    const consumption = distanceInKm * 0.2;
+    const totalDistanceKm = routeSummary.totalDistance / 1000;
+    const remainingDistanceKm = Math.max(0, totalDistanceKm - distanceTraveled);
+    
+    // Calcula ETA baseado na velocidade ATUAL e distância RESTANTE
+    const currentSpeed = parseFloat(speedKPH);
+    const timeInHours = currentSpeed > 0 ? remainingDistanceKm / currentSpeed : Infinity;
     setEta(timeInHours);
-    setBatteryConsumption(consumption);
-    setIsRoutePossible(batteryPercentage - consumption >= 0);
-  }, [routeSummary, batteryPercentage]);
+    
+  }, [routeSummary, distanceTraveled, speedKPH]);
 
-  // 3. A lógica de clique agora vem do contexto
   const handleMapClick = (e) => {
     const newWaypoint = { lat: e.latlng.lat, lng: e.latlng.lng, id: Date.now() };
     addWaypoint(newWaypoint);
   };
 
   const routePoints = [{ lat, lng }, ...waypoints];
+  const totalDistanceKm = routeSummary ? routeSummary.totalDistance / 1000 : 0;
+  const batteryConsumption = totalDistanceKm * 0.2;
+  const isRoutePossible = batteryPercentage - batteryConsumption >= 0;
 
   return (
     <div className="navigation-map-container">
       <div className="navigation-map-left">
         <div className="route-planner">
-          {/* 4. A interface se adapta se a viagem estiver ativa */}
           <h4>{isTripActive ? "Viagem em Andamento" : "Planejador de Rota"}</h4>
-          
           <div className="waypoints-list">
             {waypoints.length === 0 && <p className="empty-message">Clique no mapa para adicionar pontos.</p>}
             {waypoints.map((wp, index) => (
               <div key={wp.id} className="waypoint-item">
-                <span>Ponto {index + 1}: {wp.lat.toFixed(4)}, {wp.lng.toFixed(4)}</span>
-                {!isTripActive && (
-                  <button onClick={() => removeWaypoint(wp.id)} className="remove-btn"><FaTrash /></button>
-                )}
+                <span>Ponto {index + 1}</span>
+                {!isTripActive && <button onClick={() => removeWaypoint(wp.id)} className="remove-btn"><FaTrash /></button>}
               </div>
             ))}
           </div>
-          
           <div className="route-actions">
             {isTripActive ? (
               <button onClick={endTrip} className="action-btn clear-btn">Terminar Viagem</button>
@@ -111,21 +90,20 @@ const NavigationMap = () => {
         </div>
 
         <div className="navigation-metrics">
-           {/* ... (sem alterações aqui) ... */}
-           <div className="metrics-grid">
+          <div className="metrics-grid">
             <div className="metric-item">
-              <span className="metric-label"><strong>Distância da Rota:</strong></span>
+              <span className="metric-label"><strong>Distância Total:</strong></span>
+              <span className="metric-value">{totalDistanceKm.toFixed(2)} km</span>
+            </div>
+            <div className="metric-item">
+              <span className="metric-label"><strong>Distância Restante:</strong></span>
               <span className="metric-value">
-                {routeSummary ? (routeSummary.totalDistance / 1000).toFixed(2) : '0.00'} km
+                {isTripActive ? Math.max(0, totalDistanceKm - distanceTraveled).toFixed(2) : '--'} km
               </span>
             </div>
             <div className="metric-item">
               <span className="metric-label"><strong>ETA:</strong></span>
-              <span className="metric-value">{(eta * 60).toFixed(0)} min</span>
-            </div>
-            <div className="metric-item">
-              <span className="metric-label"><strong>Consumo Bateria:</strong></span>
-              <span className="metric-value">{batteryConsumption.toFixed(1)}%</span>
+              <span className="metric-value">{isTripActive && eta !== Infinity ? (eta * 60).toFixed(0) : '--'} min</span>
             </div>
             <div className="metric-item">
               <span className="metric-label"><strong>Rota Possível:</strong></span>
@@ -136,12 +114,21 @@ const NavigationMap = () => {
       </div>
 
       <div className="navigation-map-leaflet">
-        <MapContainer key={lat} center={[lat, lng]} zoom={mapZoom} style={{ width: "100%", height: "100%" }}>
+        <MapContainer key={`${lat}-${lng}`} center={[lat, lng]} zoom={mapZoom} style={{ width: "100%", height: "100%" }}>
           <MapClickHandler onClick={handleMapClick} isTripActive={isTripActive} />
-          <RecenterMap lat={lat} lng={lng} />
+          {isTripActive && <RecenterMap lat={lat} lng={lng} />}
           <TileLayer attribution='...' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <Marker position={[lat, lng]}><Popup>Você está aqui!</Popup></Marker>
-          <RoutingMachine waypoints={routePoints} onRouteFound={handleRouteFound} />
+          
+          {/* 2. Substituir o Marker padrão pelo nosso BoatMarker rotacionável */}
+          <BoatMarker position={[lat, lng]} heading={heading} />
+
+          {/* 3. Desenhar o caminho já percorrido se a viagem estiver ativa */}
+          {isTripActive && <Polyline positions={traveledPath} color="green" weight={5} />}
+          
+          {/* A máquina de roteamento continua desenhando a rota planejada em azul */}
+          {!isTripActive && waypoints.length > 0 && (
+             <RoutingMachine waypoints={routePoints} onRouteFound={handleRouteFound} />
+          )}
         </MapContainer>
       </div>
     </div>

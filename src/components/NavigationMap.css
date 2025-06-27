@@ -101,3 +101,13 @@
 .leaflet-routing-container {
   display: none; /* Esconde completamente o painel de direções padrão */
 }
+
+/* Estilo para o ícone customizado do barco */
+.boat-marker-icon {
+  background: none;
+  border: none;
+  color: var(--button-save-bg); /* Cor verde para destaque */
+  font-size: 24px;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s linear; /* Transição suave na rotação */
+}
