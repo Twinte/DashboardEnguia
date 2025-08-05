@@ -8,7 +8,8 @@ import './i18n';
 
 import { SettingsProvider } from './context/SettingsContext';
 import { SensorDataProvider } from './context/SensorDataContext';
-import { TripProvider } from './context/TripContext'; // 1. Importar o novo provedor
+import { TripProvider } from './context/TripContext';
+import { MQTTProvider } from './context/MQTTContext';
 import AppInitializer from './components/AppInitializer';
 
 const rootElement = document.getElementById('root');
@@ -19,10 +20,12 @@ root.render(
     <BrowserRouter>
       <SettingsProvider>
         <SensorDataProvider>
-          {/* 2. Envolver a aplicação com o TripProvider */}
-          <TripProvider>
-            <AppInitializer />
-          </TripProvider>
+          {/* ORDEM CORRIGIDA: MQTTProvider envolve TripProvider */}
+          <MQTTProvider>
+            <TripProvider>
+              <AppInitializer />
+            </TripProvider>
+          </MQTTProvider>
         </SensorDataProvider>
       </SettingsProvider>
     </BrowserRouter>

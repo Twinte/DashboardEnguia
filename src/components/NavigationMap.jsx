@@ -7,19 +7,29 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import { FaTrash } from "react-icons/fa";
 import RecenterMap from "./RecenterMap";
 import RoutingMachine from "./RoutingMachine";
-import BoatMarker from "./BoatMarker"; // 1. Importar o novo marcador
+import BoatMarker from "./BoatMarker";
 import { useSensorData } from "../context/SensorDataContext";
 import { useTrip } from "../context/TripContext";
 import './NavigationMap.css';
 
+// Componente para capturar cliques no mapa
 function MapClickHandler({ onClick, isTripActive }) {
   const map = useMapEvent("click", (e) => {
-    if (!isTripActive) onClick(e);
+    if (!isTripActive) { // Só permite cliques se a viagem não estiver ativa
+      onClick(e);
+    }
   });
+
+  // Muda o cursor do mapa com base no estado da viagem
   useEffect(() => {
     const mapContainer = map.getContainer();
-    mapContainer.style.cursor = isTripActive ? 'not-allowed' : '';
+    if (isTripActive) {
+      mapContainer.style.cursor = 'not-allowed';
+    } else {
+      mapContainer.style.cursor = '';
+    }
   }, [map, isTripActive]);
+  
   return null;
 }
 
@@ -27,9 +37,11 @@ const NavigationMap = () => {
   const { sensorData } = useSensorData();
   const { heading, lat, lng, batteryPercentage, speedKPH } = sensorData;
   
+  // Consome todos os dados e funções relevantes do TripContext
   const {
     waypoints, isTripActive, traveledPath, distanceTraveled,
-    addWaypoint, removeWaypoint, clearRoute, startTrip, endTrip
+    addWaypoint, removeWaypoint, clearRoute, startTrip, endTrip,
+    mqttConnectionStatus // <- Novo estado para o status da conexão
   } = useTrip();
 
   const [mapZoom] = useState(12);
@@ -68,6 +80,7 @@ const NavigationMap = () => {
       <div className="navigation-map-left">
         <div className="route-planner">
           <h4>{isTripActive ? "Viagem em Andamento" : "Planejador de Rota"}</h4>
+          
           <div className="waypoints-list">
             {waypoints.length === 0 && <p className="empty-message">Clique no mapa para adicionar pontos.</p>}
             {waypoints.map((wp, index) => (
@@ -77,12 +90,19 @@ const NavigationMap = () => {
               </div>
             ))}
           </div>
+          
           <div className="route-actions">
             {isTripActive ? (
               <button onClick={endTrip} className="action-btn clear-btn">Terminar Viagem</button>
             ) : (
               <>
-                <button onClick={startTrip} className="action-btn start-btn" disabled={waypoints.length === 0}>Iniciar Viagem</button>
+                <button 
+                  onClick={startTrip} 
+                  className="action-btn start-btn" 
+                  disabled={waypoints.length === 0 || mqttConnectionStatus === 'connecting'}
+                >
+                  {mqttConnectionStatus === 'connecting' ? 'Conectando...' : 'Iniciar Viagem'}
+                </button>
                 <button onClick={() => { clearRoute(); setRouteSummary(null); }} className="action-btn clear-btn" disabled={waypoints.length === 0}>Limpar Rota</button>
               </>
             )}
@@ -90,7 +110,7 @@ const NavigationMap = () => {
         </div>
 
         <div className="navigation-metrics">
-          <div className="metrics-grid">
+           <div className="metrics-grid">
             <div className="metric-item">
               <span className="metric-label"><strong>Distância Total:</strong></span>
               <span className="metric-value">{totalDistanceKm.toFixed(2)} km</span>
@@ -117,15 +137,12 @@ const NavigationMap = () => {
         <MapContainer key={`${lat}-${lng}`} center={[lat, lng]} zoom={mapZoom} style={{ width: "100%", height: "100%" }}>
           <MapClickHandler onClick={handleMapClick} isTripActive={isTripActive} />
           {isTripActive && <RecenterMap lat={lat} lng={lng} />}
-          <TileLayer attribution='...' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           
-          {/* 2. Substituir o Marker padrão pelo nosso BoatMarker rotacionável */}
           <BoatMarker position={[lat, lng]} heading={heading} />
 
-          {/* 3. Desenhar o caminho já percorrido se a viagem estiver ativa */}
           {isTripActive && <Polyline positions={traveledPath} color="green" weight={5} />}
           
-          {/* A máquina de roteamento continua desenhando a rota planejada em azul */}
           {!isTripActive && waypoints.length > 0 && (
              <RoutingMachine waypoints={routePoints} onRouteFound={handleRouteFound} />
           )}

@@ -1,47 +1,61 @@
 // src/components/RoutingMachine.jsx
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-routing-machine";
 
 const RoutingMachine = ({ waypoints, onRouteFound }) => {
   const map = useMap();
+  // Usamos useRef para manter a instância do controle de rota entre as renderizações
+  const routingControlRef = useRef(null);
 
+  // Efeito para criar e remover o controle de rota (roda apenas uma vez)
   useEffect(() => {
-    if (!map || waypoints.length < 2) return;
+    if (!map) return;
 
-    // Converte nossos waypoints para o formato que a biblioteca espera
-    const leafletWaypoints = waypoints.map(wp => L.latLng(wp.lat, wp.lng));
-
-    const routingControl = L.Routing.control({
-      waypoints: leafletWaypoints,
-      routeWhileDragging: true, // Recalcula a rota ao arrastar um ponto
-      addWaypoints: false,      // Não permite que o usuário adicione waypoints clicando na rota
-      show: false,              // Esconde o painel de direções padrão
-      
-      // Personaliza a linha da rota
+    // Cria a instância do controle de rota
+    const instance = L.Routing.control({
+      // Começa sem waypoints, eles serão adicionados no próximo efeito
+      waypoints: [], 
+      routeWhileDragging: true,
+      addWaypoints: false,
+      show: false,
       lineOptions: {
         styles: [{ color: '#3388ff', opacity: 0.7, weight: 5 }]
       }
     }).addTo(map);
 
-    // Adiciona um listener para quando a rota for encontrada/calculada
-    routingControl.on('routesfound', function(e) {
-      const routes = e.routes;
-      if (routes.length > 0) {
-        // Envia o resumo da rota (distância, tempo) para o componente pai
-        onRouteFound(routes[0].summary);
+    // Guarda a instância na nossa referência
+    routingControlRef.current = instance;
+
+    // Adiciona o listener para o evento
+    instance.on('routesfound', function(e) {
+      if (e.routes.length > 0) {
+        onRouteFound(e.routes[0].summary);
       }
     });
 
-    // Função de limpeza para remover o controle de rota quando o componente desmontar
+    // Função de limpeza: remove o controle do mapa quando o componente é desmontado
     return () => {
-      map.removeControl(routingControl);
+      map.removeControl(instance);
     };
+  }, [map, onRouteFound]); // Depende apenas do mapa e da função de callback
 
-  }, [map, waypoints, onRouteFound]); // Roda o efeito sempre que o mapa ou os waypoints mudarem
+  // Efeito para ATUALIZAR os waypoints sempre que eles mudarem
+  useEffect(() => {
+    // Se o controle ainda não foi criado ou não temos waypoints, não faz nada
+    if (!routingControlRef.current || waypoints.length === 0) {
+      return;
+    }
 
-  return null; // Este componente não renderiza nada diretamente
+    const leafletWaypoints = waypoints.map(wp => L.latLng(wp.lat, wp.lng));
+    
+    // Apenas atualiza os waypoints no controle existente
+    routingControlRef.current.setWaypoints(leafletWaypoints);
+
+  }, [waypoints]); // Depende apenas da lista de waypoints
+
+  return null; // Componente não renderiza nada
 };
 
 export default RoutingMachine;
