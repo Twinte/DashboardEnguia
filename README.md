@@ -1,7 +1,3 @@
-Claro\! Com base nas novas funcionalidades e na estrutura do projeto, aqui está uma versão atualizada e mais completa do ficheiro `README.md`.
-
------
-
 # Dashboard para Monitorização de Embarcação Elétrica
 
 Este projeto é uma aplicação de **dashboard interativo** desenvolvida para a monitorização e controlo em tempo real de uma **embarcação elétrica**. O sistema permite visualizar métricas essenciais de desempenho, gerir a navegação com um mapa interativo e configurar diversas preferências do sistema, tudo numa interface moderna e responsiva.
