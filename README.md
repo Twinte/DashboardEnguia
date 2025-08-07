@@ -1,65 +1,108 @@
-# Dashboard para Monitoramento de Embarcação Elétrica
+Claro\! Com base nas novas funcionalidades e na estrutura do projeto, aqui está uma versão atualizada e mais completa do ficheiro `README.md`.
 
-Este projeto é uma aplicação de **dashboard interativo** desenvolvido para o monitoramento e controle de uma **embarcação elétrica**. O sistema permite visualizar métricas essenciais relacionadas ao desempenho da embarcação, como **velocidade, direção, consumo de energia, e status da bateria**, além de exibir um mapa interativo com informações de navegação.
+-----
 
-## Funcionalidades
+# Dashboard para Monitorização de Embarcação Elétrica
 
-### 1. **Dashboard**
-- Exibe **informações gerais** sobre a embarcação, incluindo **velocidade (em KPH)**, **RPM do motor**, **status da bateria** e **temperatura**.
-- Utiliza **indicadores gráficos** como **odômetros** para visualizar dados de forma clara e intuitiva.
+Este projeto é uma aplicação de **dashboard interativo** desenvolvida para a monitorização e controlo em tempo real de uma **embarcação elétrica**. O sistema permite visualizar métricas essenciais de desempenho, gerir a navegação com um mapa interativo e configurar diversas preferências do sistema, tudo numa interface moderna e responsiva.
 
-### 2. **Configurações**
-- Permite configurar **parâmetros do sistema** da embarcação elétrica, incluindo:
-  - Configuração da **cor do painel**.
-  - Alteração de **preferências de idioma**.
-  - Ajustes do **estilo do dashboard**.
-  - Configurações do **banner de cookies**.
-- Todas as configurações podem ser alteradas diretamente na interface, com visualização em tempo real.
+## Funcionalidades Principais
 
-### 3. **Navegação**
-- Exibe um **mapa interativo** utilizando a biblioteca **Leaflet** e sobreposição do **OpenSeaMap** para dados marítimos.
-- Inclui um **bússola animada** que rotaciona com base na direção atual da embarcação (cálculo de orientação).
-- Exibe **dados de navegação** como **coordenadas atuais**, **ETA (tempo estimado de chegada)**, **tempo restante de navegação** e **faixa de bateria restante**.
+### 1\. **Dashboard Principal (Home)**
+
+  - Exibe **informações vitais** num piscar de olhos, incluindo **velocidade (KPH)**, **RPM do motor**, **percentagem da bateria** e **velocidade do vento**.
+  - Utiliza **medidores gráficos (gauges)** para uma visualização clara e intuitiva dos dados.
+
+### 2\. **Navegação Interativa**
+
+  - Apresenta um **mapa interativo** que utiliza **Leaflet** para visualização.
+  - **Planeamento de Rota:** Permite adicionar pontos de passagem (`waypoints`) diretamente no mapa para criar uma rota.
+  - **Acompanhamento em Tempo Real:** Exibe a posição atual da embarcação com um marcador que indica a direção (`heading`).
+  - **Telemetria via MQTT:** Durante uma viagem ativa, os dados de telemetria (coordenadas, velocidade) são publicados em tempo real para um broker MQTT, permitindo o acompanhamento remoto.
+
+### 3\. **Gestão de Energia**
+
+  - Uma página dedicada para monitorizar detalhadamente o estado da bateria, incluindo **percentagem de carga**, **voltagem** e **temperatura**.
+
+### 4\. **Configurações Avançadas**
+
+  - Painel de configurações que permite personalizar a experiência do utilizador.
+  - Opções incluem a alteração de **tema (claro/escuro)** e **idioma (inglês/português)**, com as preferências a serem guardadas localmente.
+
+## Tecnologias Utilizadas
+
+  - **Frontend:** React, Vite
+  - **Roteamento:** React Router
+  - **Gestão de Estado:** React Context API
+  - **Mapa:** Leaflet, React-Leaflet, Leaflet Routing Machine
+  - **Comunicação em Tempo Real:** Paho MQTT
+  - **Internacionalização:** i18next
+  - **Containerização:** Docker, Nginx
 
 ## Estrutura do Projeto
 
-O projeto foi desenvolvido utilizando as seguintes tecnologias:
-- **React** para a construção do frontend interativo.
-- **Vite** como ferramenta de bundling para otimização de desempenho.
-- **Leaflet** e **OpenSeaMap** para visualização de mapas e dados marítimos.
-- **React-spring** para animações suaves (por exemplo, rotação da bússola).
-
-### Estrutura de Pastas
-
+```
 /src
-  /components
-    - Dashboard.jsx
-    - SettingsPage.jsx
-    - NavigationMap.jsx
-  /assets
-    - compass.svg
-  App.jsx
-  App.css
-  index.js
+  /assets          # Imagens, logos e outros recursos estáticos
+  /components      # Componentes React reutilizáveis (HomePage, SettingsPage, etc.)
+  /context         # Contextos React para gestão de estado (SensorData, Settings, etc.)
+  /locales         # Ficheiros de tradução (JSON)
+  /utils           # Funções utilitárias (formatação, cálculos, etc.)
+  App.jsx          # Componente principal da aplicação e estrutura de rotas
+  main.jsx         # Ponto de entrada da aplicação
+  i18n.js          # Configuração da internacionalização
+```
 
+## Como Executar o Projeto
 
-## Como Rodar o Projeto
+Siga os passos abaixo para executar o projeto localmente.
 
-Para rodar o projeto localmente, siga os seguintes passos:
+### Pré-requisitos
 
-### 1. **Clonar o repositório**
+  - Node.js (versão 18 ou superior)
+  - npm (ou pnpm/yarn)
+
+### 1\. **Clonar o Repositório**
 
 ```bash
 git clone https://github.com/seu-usuario/dashboard-embarcacao-eletrica.git
 cd dashboard-embarcacao-eletrica
+```
 
+### 2\. **Instalar as Dependências**
 
-### 2. **Instalar as dependências**
-
+```bash
 npm install
+```
 
-### 3. **Rodar a aplicação**
+### 3\. **Executar em Modo de Desenvolvimento**
 
+```bash
 npm run dev
+```
 
-Isso irá iniciar o servidor de desenvolvimento e você poderá acessar o dashboard localmente em http://localhost:5173.
+A aplicação estará disponível em `http://localhost:5173`.
+
+## Simulação de Dados
+
+Para o desenvolvimento local, o projeto obtém dados de uma API que, por sua vez, é alimentada por um script de simulação. O ficheiro `main.py` gera dados realistas de sensores (velocidade, RPM, bateria, etc.) e armazena-os numa base de dados SQLite, que serve de fonte para a API.
+
+## Deployment com Docker
+
+O projeto inclui um `Dockerfile` para facilitar o deployment em produção.
+
+### 1\. **Construir a Imagem Docker**
+
+A partir da raiz do projeto, execute:
+
+```bash
+docker build -t dashboard-eletrico .
+```
+
+### 2\. **Executar o Container**
+
+```bash
+docker run -d -p 8080:80 dashboard-eletrico
+```
+
+A aplicação estará acessível em `http://localhost:8080`.
