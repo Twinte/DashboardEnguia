@@ -1,8 +1,22 @@
+# Dependências do Node, que serão instaladas dentro do container
 node_modules
+
+# Pasta de build, que será gerada dentro do container
+dist
+
+# Arquivos de ambiente locais. Devem ser gerenciados em tempo de execução.
+.env
+.env.*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Git
 .git
-.DS_Store
-build
-.cache
-.env        # Exclude environment variables for security
-Dockerfile  # No need to include the Dockerfile itself
+.gitignore
+
+# Docker
+Dockerfile
 .dockerignore

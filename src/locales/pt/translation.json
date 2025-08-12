@@ -66,5 +66,6 @@
   "battery_charge": "Carga da Bateria",
   "voltage": "Voltagem",
   "current_draw": "Consumo Atual", 
-  "estimated_time_remaining": "Tempo Restante Estimado"
+  "estimated_time_remaining": "Tempo Restante Estimado",
+  "save_changes_success_toast": "Definições guardadas com sucesso!"
 }

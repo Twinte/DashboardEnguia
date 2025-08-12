@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { useSettings } from '../context/SettingsContext';
-// Importar a logo
+import { useToast } from '../context/ToastContext'; // 1. Importar o hook para as notificações
 import logoNorteEnergia from '../assets/logos/norteenergia.svg'; 
 import "./SettingsPage.css";
 
@@ -19,7 +19,8 @@ const availableThemes = [
 const SettingsPage = () => {
   const { t } = useTranslation(); 
   const { theme, changeTheme, language, changeLanguage } = useSettings(); 
-  
+  const { addToast } = useToast(); // 2. Chamar o hook para ter acesso à função addToast
+
   const [activeCategoryKey, setActiveCategoryKey] = useState('appearance'); 
 
   const getSettingsData = () => ({
@@ -57,6 +58,13 @@ const SettingsPage = () => {
     setActiveCategoryKey(categoryKey);
   };
 
+  // 3. Função para ser chamada ao clicar no botão de guardar
+  const handleSaveChanges = () => {
+    // A lógica para guardar os dados viria aqui.
+    // Após a lógica ser concluída com sucesso, exibimos a notificação.
+    addToast(t('save_changes_success_toast'), 'success');
+  };
+
   return (
     <div className="settings-page">
       {/* Sidebar Navigation */}
@@ -74,10 +82,8 @@ const SettingsPage = () => {
           ))}
         </ul>
         
-        {/* Secção da Logo (Antiga secção User Profile) */}
-        <div className="logo-profile-section"> {/* Mudamos a classe para maior clareza ou mantemos user-profile e ajustamos o CSS */}
+        <div className="logo-profile-section">
           <img src={logoNorteEnergia} alt={t('logo_alt_text')} className="sidebar-logo" />
-          {/* Adicione 'logo_alt_text' aos seus ficheiros de tradução. Ex: "Logo da Norte Energia" */}
         </div>
       </div>
 
@@ -88,7 +94,7 @@ const SettingsPage = () => {
           {settingsData[activeCategoryKey]?.map((setting, index) => ( 
             <div
               key={index}
-              className="setting-item"
+              className="setting-item card"
             >
               <h3>{t(setting.labelKey)}</h3> 
               {setting.descriptionKey && <p>{t(setting.descriptionKey)}</p>}
@@ -130,8 +136,11 @@ const SettingsPage = () => {
           ))}
         </div>
          <div className="action-buttons">
-           <button className="cancel-btn">{t('cancel')}</button> 
-           <button className="save-btn">{t('save_changes')}</button> 
+           <button className="btn">{t('cancel')}</button> 
+           {/* 4. Adicionar o onClick ao botão para chamar a função */}
+           <button className="btn btn-primary" onClick={handleSaveChanges}>
+             {t('save_changes')}
+           </button> 
          </div>
       </div>
     </div>

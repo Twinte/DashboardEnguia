@@ -1,6 +1,6 @@
 // src/components/NavigationMap.jsx
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvent, Polyline } from "react-leaflet";
+import { MapContainer, TileLayer, useMapEvent, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
@@ -37,11 +37,10 @@ const NavigationMap = () => {
   const { sensorData } = useSensorData();
   const { heading, lat, lng, batteryPercentage, speedKPH } = sensorData;
   
-  // Consome todos os dados e funções relevantes do TripContext
   const {
     waypoints, isTripActive, traveledPath, distanceTraveled,
     addWaypoint, removeWaypoint, clearRoute, startTrip, endTrip,
-    mqttConnectionStatus // <- Novo estado para o status da conexão
+    mqttConnectionStatus
   } = useTrip();
 
   const [mapZoom] = useState(12);
@@ -58,7 +57,6 @@ const NavigationMap = () => {
     const totalDistanceKm = routeSummary.totalDistance / 1000;
     const remainingDistanceKm = Math.max(0, totalDistanceKm - distanceTraveled);
     
-    // Calcula ETA baseado na velocidade ATUAL e distância RESTANTE
     const currentSpeed = parseFloat(speedKPH);
     const timeInHours = currentSpeed > 0 ? remainingDistanceKm / currentSpeed : Infinity;
     setEta(timeInHours);
@@ -78,32 +76,36 @@ const NavigationMap = () => {
   return (
     <div className="navigation-map-container">
       <div className="navigation-map-left">
-        <div className="route-planner">
-          <h4>{isTripActive ? "Viagem em Andamento" : "Planejador de Rota"}</h4>
+        <div className="route-planner card"> {/* MODIFICADO AQUI */}
+          <h4 className="card-header">{isTripActive ? "Viagem em Andamento" : "Planejador de Rota"}</h4> {/* MODIFICADO AQUI */}
           
           <div className="waypoints-list">
             {waypoints.length === 0 && <p className="empty-message">Clique no mapa para adicionar pontos.</p>}
             {waypoints.map((wp, index) => (
               <div key={wp.id} className="waypoint-item">
                 <span>Ponto {index + 1}</span>
-                {!isTripActive && <button onClick={() => removeWaypoint(wp.id)} className="remove-btn"><FaTrash /></button>}
+                {!isTripActive && 
+                  <button onClick={() => removeWaypoint(wp.id)} className="btn-icon btn-danger"> {/* MODIFICADO AQUI */}
+                    <FaTrash />
+                  </button>
+                }
               </div>
             ))}
           </div>
           
           <div className="route-actions">
             {isTripActive ? (
-              <button onClick={endTrip} className="action-btn clear-btn">Terminar Viagem</button>
+              <button onClick={endTrip} className="btn btn-danger">Terminar Viagem</button> /* MODIFICADO AQUI */
             ) : (
               <>
                 <button 
                   onClick={startTrip} 
-                  className="action-btn start-btn" 
+                  className="btn btn-primary" /* MODIFICADO AQUI */
                   disabled={waypoints.length === 0 || mqttConnectionStatus === 'connecting'}
                 >
                   {mqttConnectionStatus === 'connecting' ? 'Conectando...' : 'Iniciar Viagem'}
                 </button>
-                <button onClick={() => { clearRoute(); setRouteSummary(null); }} className="action-btn clear-btn" disabled={waypoints.length === 0}>Limpar Rota</button>
+                <button onClick={() => { clearRoute(); setRouteSummary(null); }} className="btn" disabled={waypoints.length === 0}>Limpar Rota</button> {/* MODIFICADO AQUI */}
               </>
             )}
           </div>

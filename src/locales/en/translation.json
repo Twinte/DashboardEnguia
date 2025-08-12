@@ -66,5 +66,6 @@
   "battery_charge": "Battery Charge",
   "voltage": "Voltage",
   "current_draw": "Current Draw", 
-  "estimated_time_remaining": "Estimated Time Remaining"
+  "estimated_time_remaining": "Estimated Time Remaining",
+  "save_changes_success_toast": "Settings saved successfully!"
 }

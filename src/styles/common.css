@@ -1,0 +1,96 @@
+/* src/styles/common.css */
+
+/* ======================================================= */
+/* ================== Componente: Card =================== */
+/* ======================================================= */
+.card {
+  background-color: var(--background-nav);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+  border-color: var(--text-secondary);
+}
+
+.card-header {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+  font-size: 1.2rem;
+}
+
+/* ======================================================= */
+/* ================== Componente: Botão ================== */
+/* ======================================================= */
+.btn {
+  padding: 10px 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  background-color: var(--button-bg);
+  color: var(--text-primary);
+  flex-grow: 1; /* Para botões em flex containers */
+}
+
+.btn:hover {
+  background-color: var(--button-hover-bg);
+  border-color: var(--text-secondary);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Modificador: Botão Primário/Salvar */
+.btn-primary {
+  background-color: var(--button-save-bg);
+  border-color: var(--button-save-bg);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: var(--button-save-hover-bg);
+  border-color: var(--button-save-hover-bg);
+  color: #ffffff;
+}
+
+/* Modificador: Botão de Perigo/Cancelar */
+.btn-danger {
+  background-color: #c0392b;
+  border-color: #c0392b;
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background-color: #a02b1c;
+  border-color: #a02b1c;
+  color: #ffffff;
+}
+
+/* Modificador: Botão pequeno (para ícones) */
+.btn-icon {
+    padding: 0.4rem;
+    background: none;
+    border: none;
+    line-height: 1;
+    flex-grow: 0;
+}
+
+.btn-icon.btn-danger {
+    background: none;
+    color: #e74c3c;
+}
+
+.btn-icon.btn-danger:hover {
+    background: none;
+    color: #c0392b;
+}

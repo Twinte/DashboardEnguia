@@ -7,82 +7,73 @@
 
 .settings-sidebar {
   width: 20%; /* Largura da Sidebar */
-  background-color: var(--background-nav); /* Usar variável de tema */
-  color: var(--text-primary); /* Usar variável de tema */
+  background-color: var(--background-nav);
+  color: var(--text-primary);
   padding: 1rem;
-  border-right: 2px solid var(--border-color); /* Usar variável de tema */
+  border-right: 2px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Empurra a secção da logo para o fundo */
+  justify-content: space-between;
 }
 
 .sidebar-title {
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: var(--text-primary); /* Garante a cor do título */
+  color: var(--text-primary);
 }
 
 .settings-sidebar ul {
   list-style-type: none;
   padding: 0;
-  margin: 0; /* Garante que não haja margem padrão na lista */
+  margin: 0;
 }
 
 .settings-sidebar li {
-  padding: 10px 15px; /* Ajuste o padding se necessário */
+  padding: 10px 15px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   font-size: 1.1rem;
-  border-radius: 6px; /* Bordas arredondadas para itens da lista */
-  margin-bottom: 0.25rem; /* Pequeno espaço entre itens */
-  color: var(--text-secondary); /* Cor para itens não ativos */
+  border-radius: 6px;
+  margin-bottom: 0.25rem;
+  color: var(--text-secondary);
 }
 
 .settings-sidebar li:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* Usar cor sutil do tema */
+  background-color: rgba(255, 255, 255, 0.1);
   color: var(--text-primary);
 }
 .settings-sidebar li.active {
-  background-color: var(--button-bg); /* Cor de destaque do tema */
+  background-color: var(--button-bg);
   color: var(--text-primary);
   font-weight: 600;
 }
 
-/* Estilo para a secção que contém a logo (antigo .user-profile) */
-.logo-profile-section { /* Ou .user-profile se manteve o nome da classe no JSX */
+.logo-profile-section {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centraliza a logo horizontalmente */
-  justify-content: center; /* Centraliza a logo verticalmente na sua secção */
-  padding: 1rem 0; /* Espaçamento vertical, sem padding lateral para não limitar a largura da imagem */
-  /* margin-top: auto;  Removido, pois justify-content: space-between no pai deve cuidar disso */
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0;
 }
 
-/* Estilo para a imagem da logo */
 .sidebar-logo {
-  max-width: 80%;   /* A logo ocupará no máximo 80% da largura da sidebar */
-  max-height: 100px; /* Defina uma altura máxima para a logo. AJUSTE ESTE VALOR! */
-  height: auto;      /* Mantém a proporção da imagem */
-  object-fit: contain; /* Garante que a imagem inteira seja visível, sem cortar */
+  max-width: 80%;
+  max-height: 100px;
+  height: auto;
+  object-fit: contain;
 }
-
-/* Estilos anteriores para .user-profile, .user-name, .user-email foram removidos ou comentados */
-/* .user-profile { ... } */
-/* .user-name { ... } */
-/* .user-email { ... } */
-
 
 .settings-content {
-  width: 80%; /* Área de conteúdo principal */
-  padding: 1.5rem; /* Mais padding para o conteúdo */
-  background-color: var(--background-secondary); /* Usar variável de tema */
-  color: var(--text-primary); /* Usar variável de tema */
-  overflow-y: auto; /* Scroll para conteúdo extenso */
+  width: 80%;
+  padding: 1.5rem;
+  background-color: var(--background-secondary);
+  color: var(--text-primary);
+  overflow-y: auto;
 }
 
 .settings-content h2 {
-  margin-bottom: 1.5rem; /* Mais espaço abaixo do título da secção */
-  border-bottom: 1px solid var(--border-color); /* Linha divisória sutil */
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.75rem;
 }
 
@@ -90,28 +81,22 @@
   margin-top: 1rem;
 }
 
+/* A classe .setting-item agora é um .card, mas mantemos o espaçamento */
 .setting-item {
-  margin-bottom: 1.25rem; /* Mais espaço entre itens de configuração */
-  padding: 1rem; /* Padding interno para cada item */
-  border: 1px solid var(--border-color); /* Usar variável de tema */
-  border-radius: 8px;
-  background-color: var(--background-nav); /* Usar variável de tema, mais escura que o fundo do content */
-  transition: background-color 0.3s ease;
+  margin-bottom: 1.25rem;
 }
 
-.setting-item:hover {
-  background-color: rgba(255, 255, 255, 0.05); /* Efeito hover sutil */
-}
-
+/* O padding e a borda agora vêm da classe .card */
+/* Apenas mantemos os estilos para os elementos INTERNOS */
 .setting-item h3 {
-  margin: 0 0 0.5rem 0; /* Espaço abaixo do título do setting */
+  margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
 }
 
 .setting-item p {
   font-size: 0.9rem;
-  opacity: 0.8; /* Texto de descrição um pouco mais suave */
-  margin-bottom: 0.75rem; /* Espaço antes do input/select */
+  opacity: 0.8;
+  margin-bottom: 0.75rem;
 }
 
 .setting-item input[type="text"],
@@ -119,95 +104,54 @@
 .setting-item input[type="number"],
 .setting-item input[type="color"],
 .setting-item select {
-  margin-top: 5px; /* Reduzido, pois já há margem no <p> */
-  padding: 8px 10px; /* Padding confortável */
-  background-color: var(--background-primary); /* Fundo claro para contraste */
+  margin-top: 5px;
+  padding: 8px 10px;
+  background-color: var(--background-primary);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   border-radius: 5px;
-  width: 100%; /* Ocupar largura total disponível */
-  max-width: 300px; /* Limitar largura máxima para inputs/selects */
+  width: 100%;
+  max-width: 300px;
   box-sizing: border-box;
 }
 .setting-item input[type="color"] {
-  padding: 2px; /* Padding menor para input de cor */
-  height: 40px; /* Altura para input de cor */
-  max-width: 100px; /* Largura menor para input de cor */
+  padding: 2px;
+  height: 40px;
+  max-width: 100px;
 }
 
 
 .setting-item input[type="checkbox"].toggle-switch {
-  /* Estilos para um switch (se quiser implementar visualmente) */
-  /* Por agora, é um checkbox normal */
-  width: auto; /* Checkbox não ocupa largura total */
+  width: auto;
   max-width: none;
   margin-right: 0.5rem;
   vertical-align: middle;
 }
 
+/* Os estilos dos botões foram removidos daqui */
 .action-buttons {
   margin-top: 20px;
   display: flex;
-  justify-content: flex-end; /* Alinhar botões à direita */
+  justify-content: flex-end;
   gap: 10px;
 }
-
-.action-buttons button {
-  background-color: var(--button-bg); /* Usar variável de tema */
-  color: var(--text-primary); /* Usar variável de tema */
-  border: 1px solid var(--border-color); /* Adicionar uma borda sutil */
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-  font-weight: 500;
-}
-
-.action-buttons button:hover {
-  background-color: var(--button-hover-bg); /* Usar variável de tema */
-  border-color: var(--text-secondary);
-}
-
-.action-buttons .save-btn {
-  background-color: var(--button-save-bg); /* Usar variável de tema */
-  border-color: var(--button-save-bg);
-  color: #fff; /* Texto branco para botões de salvar */
-}
-
-.action-buttons .save-btn:hover {
-  background-color: var(--button-save-hover-bg); /* Usar variável de tema */
-  border-color: var(--button-save-hover-bg);
-}
-
 
 /* ======================================================= */
 /* ======== ESTILOS RESPONSIVOS PARA SETTINGS PAGE ======== */
 /* ======================================================= */
-
-/* Mantém os estilos responsivos que já tínhamos em App.css para .settings-page e .settings-sidebar,
-   mas aqui podemos refinar APENAS os estilos INTERNOS de SettingsPage.css se necessário.
-   Se os estilos em App.css forem suficientes, esta secção pode ser menor.
-*/
-
 @media (max-width: 992px) {
-  /* Em App.css, .settings-page já se torna flex-direction: column */
-  /* Em App.css, .settings-sidebar e .settings-content já se tornam width: 100% */
-  
   .settings-sidebar {
-    max-height: none; /* Permitir que a sidebar cresça no modo tablet empilhado */
-    /* justify-content: flex-start; /* Remover se usava space-between para empurrar logo */
+    max-height: none;
   }
   .logo-profile-section {
-    /* Ajustar margem se o justify-content: space-between foi removido da sidebar */
-    margin-top: 1rem; /* Adicionar um pouco de espaço acima da logo */
-    padding-bottom: 0; /* Remover padding inferior se não houver mais nada abaixo */
+    margin-top: 1rem;
+    padding-bottom: 0;
   }
   .sidebar-logo {
-    max-height: 80px; /* Logo um pouco menor em tablet */
+    max-height: 80px;
   }
-
   .settings-content {
-    padding: 1rem; /* Menos padding no conteúdo em tablet */
+    padding: 1rem;
   }
   .settings-content h2 {
     font-size: 1.3rem;
@@ -215,22 +159,19 @@
 }
 
 @media (max-width: 600px) {
-  /* Em App.css, .settings-sidebar ul já se torna flex-direction: column */
-
   .sidebar-title {
-    font-size: 1.3rem; /* Título da sidebar menor */
+    font-size: 1.3rem;
   }
   .settings-sidebar li {
-    font-size: 1rem; /* Itens da lista menores */
+    font-size: 1rem;
     padding: 8px 10px;
   }
   .logo-profile-section {
     padding: 0.5rem 0;
   }
   .sidebar-logo {
-    max-height: 60px; /* Logo ainda menor em mobile */
+    max-height: 60px;
   }
-
   .settings-content {
     padding: 0.75rem;
   }
@@ -240,7 +181,6 @@
     padding-bottom: 0.5rem;
   }
   .setting-item {
-    padding: 0.75rem;
     margin-bottom: 1rem;
   }
   .setting-item h3 {
@@ -259,23 +199,18 @@
     font-size: 0.9rem;
   }
   .action-buttons {
-    flex-direction: column; /* Empilhar botões em mobile */
+    flex-direction: column;
     gap: 8px;
   }
   .action-buttons button {
-    width: 100%; /* Botões ocupam largura total */
+    width: 100%;
   }
 }
 
-/* Ajustes para TELEMÓVEIS EM PAISAGEM (landscape) dentro de SettingsPage.css */
-/* Se os ajustes em App.css não forem suficientes */
 @media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
-  /* Em App.css, .settings-page já se torna flex-direction: row */
-  /* Em App.css, .settings-sidebar e .settings-content já têm larguras ajustadas */
-
   .settings-sidebar {
-    padding: 0.5rem; /* Menos padding na sidebar em paisagem mobile */
-    justify-content: flex-start; /* Alinhar itens ao topo, já que a logo ficará visível */
+    padding: 0.5rem;
+    justify-content: flex-start;
   }
   .sidebar-title {
     font-size: 1rem;
@@ -286,15 +221,14 @@
     padding: 0.3rem 0.4rem;
   }
   .logo-profile-section {
-    padding: 0.5rem 0 0 0; /* Sem padding inferior, só superior */
-    margin-top: auto; /* Tentar empurrar para baixo */
+    padding: 0.5rem 0 0 0;
+    margin-top: auto;
   }
   .sidebar-logo {
-    max-height: 50px; /* Logo bem pequena */
+    max-height: 50px;
   }
-
   .settings-content {
-    padding: 0.5rem 0.75rem; /* Menos padding no conteúdo */
+    padding: 0.5rem 0.75rem;
   }
   .settings-content h2 {
     font-size: 1rem;
