@@ -3,6 +3,8 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 
 // 1. Criar o Contexto
 const SensorDataContext = createContext();
+const INITIAL_LATITUDE = -1.4558;
+const INITIAL_LONGITUDE = -48.5036;
 
 // 2. Criar o Provedor (Provider)
 export const SensorDataProvider = ({ children }) => {
@@ -16,8 +18,8 @@ export const SensorDataProvider = ({ children }) => {
     windSpeed: 0,
     temp: 0,
     heading: 0,
-    lat: 51.505,
-    lng: -0.09,
+    lat: INITIAL_LATITUDE,
+    lng: INITIAL_LONGITUDE,
   });
   const [fetchError, setFetchError] = useState(false);
 
