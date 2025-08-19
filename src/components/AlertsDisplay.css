@@ -1,0 +1,64 @@
+/* src/components/AlertsDisplay.css */
+.alerts-container {
+  width: 100%;
+  padding: 0 1rem; /* Alinhar com o padding do .dashboard-container */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem; /* Espaço antes do .main-dash */
+}
+
+.alert-banner {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  animation: slide-down 0.3s ease-out;
+}
+
+.alert-warning {
+  background-color: #f39c12; /* Laranja para aviso */
+}
+
+.alert-danger {
+  background-color: #e74c3c; /* Vermelho para perigo */
+}
+
+.alert-icon {
+  margin-right: 0.75rem;
+  font-size: 1.2rem;
+}
+
+.alert-message {
+  flex-grow: 1;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.alert-dismiss-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  opacity: 0.8;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.alert-dismiss-btn:hover {
+  opacity: 1;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -3,7 +3,6 @@ import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
-// 1. Importar o objeto L do Leaflet e os ícones diretamente
 import L from 'leaflet';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -13,18 +12,18 @@ import './index.css';
 import './i18n';
 import './styles/common.css';
 import './styles/Toast.css';
+import './styles/Skeletons.css';
 
 import { SettingsProvider } from './context/SettingsContext';
 import { SensorDataProvider } from './context/SensorDataContext';
 import { TripProvider } from './context/TripContext';
 import { MQTTProvider } from './context/MQTTContext';
 import { ToastProvider } from './context/ToastContext';
+import { AlertProvider } from './context/AlertContext'; // 1. Importar o AlertProvider
 import AppInitializer from './components/AppInitializer';
 
-// 2. CORREÇÃO: Redefinir os caminhos dos ícones padrão do Leaflet
-// Isto "junta" as nossas importações de imagens com a configuração padrão do Leaflet.
-// O Vite irá agora processar estas imagens e colocá-las na pasta de build.
-delete L.Icon.Default.prototype._getIconUrl; // Remove a implementação antiga
+// Correção para os ícones do Leaflet em produção
+delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
   iconRetinaUrl: markerIcon2x,
@@ -42,7 +41,10 @@ root.render(
           <MQTTProvider>
             <TripProvider>
               <ToastProvider>
-                <AppInitializer />
+                {/* 2. Envolver a aplicação com o AlertProvider */}
+                <AlertProvider>
+                  <AppInitializer />
+                </AlertProvider>
               </ToastProvider>
             </TripProvider>
           </MQTTProvider>
