@@ -6,15 +6,14 @@ const MQTTContext = createContext();
 
 export const MQTTProvider = ({ children }) => {
   const [client, setClient] = useState(null);
-  const [connectionStatus, setConnectionStatus] = useState('disconnected'); // disconnected, connecting, connected, error
+  const [connectionStatus, setConnectionStatus] = useState('disconnected');
 
-  // --- CONFIGURAÇÃO DO BROKER ---
-  // !! IMPORTANTE: Estes valores devem vir de variáveis de ambiente no futuro !!
-  const brokerHost = 'test.mosquitto.org'; // Usando um broker público para teste
-  const brokerPort = 8081; // Porta para WebSockets (WSS)
+  // --- CONFIGURAÇÃO DO BROKER ATUALIZADA ---
+  // Trocamos o servidor 'test.mosquitto.org' pelo 'broker.hivemq.com', que é mais estável.
+  const brokerHost = 'broker.hivemq.com';
+  const brokerPort = 8884; // O HiveMQ usa a porta 8884 para WSS
   const clientId = `electric_boat_dashboard_${Math.random().toString(16).substr(2, 8)}`;
 
-  // Função para conectar ao broker
   const connect = () => {
     setConnectionStatus('connecting');
     console.log('MQTT: Conectando...');
@@ -30,7 +29,6 @@ export const MQTTProvider = ({ children }) => {
       };
 
       newClient.onMessageArrived = (message) => {
-        // Lógica para receber mensagens (não usaremos no dashboard do barco, mas é bom ter)
         console.log('MQTT: Mensagem recebida:', message.payloadString);
       };
 
@@ -44,7 +42,7 @@ export const MQTTProvider = ({ children }) => {
           console.error('MQTT: Falha ao conectar:', err);
           setConnectionStatus('error');
         },
-        useSSL: true, // Usar conexão segura (wss://)
+        useSSL: true, // Continuamos a usar conexão segura (wss://)
         timeout: 5,
         reconnect: true,
       });
@@ -55,7 +53,6 @@ export const MQTTProvider = ({ children }) => {
     }
   };
 
-  // Função para desconectar
   const disconnect = () => {
     if (client) {
       console.log('MQTT: Desconectando...');
@@ -65,13 +62,12 @@ export const MQTTProvider = ({ children }) => {
     }
   };
 
-  // Função para publicar uma mensagem
   const publish = (topic, payload) => {
     if (client && connectionStatus === 'connected') {
       try {
         const message = new Paho.Message(JSON.stringify(payload));
         message.destinationName = topic;
-        message.qos = 1; // Qualidade de Serviço 1: Pelo menos uma vez
+        message.qos = 1;
         client.send(message);
       } catch (error) {
         console.error("MQTT: Erro ao publicar mensagem:", error);
@@ -91,7 +87,6 @@ export const MQTTProvider = ({ children }) => {
   return <MQTTContext.Provider value={value}>{children}</MQTTContext.Provider>;
 };
 
-// Hook para usar o contexto
 export const useMQTT = () => {
   return useContext(MQTTContext);
 };
