@@ -19,7 +19,7 @@ import { SensorDataProvider } from './context/SensorDataContext';
 import { TripProvider } from './context/TripContext';
 import { MQTTProvider } from './context/MQTTContext';
 import { ToastProvider } from './context/ToastContext';
-import { AlertProvider } from './context/AlertContext'; // 1. Importar o AlertProvider
+import { AlertProvider } from './context/AlertContext';
 import AppInitializer from './components/AppInitializer';
 
 // Correção para os ícones do Leaflet em produção
@@ -38,16 +38,16 @@ root.render(
     <BrowserRouter>
       <SettingsProvider>
         <SensorDataProvider>
-          <MQTTProvider>
-            <TripProvider>
-              <ToastProvider>
-                {/* 2. Envolver a aplicação com o AlertProvider */}
+          {/* A ORDEM FOI CORRIGIDA AQUI */}
+          <ToastProvider>
+            <MQTTProvider>
+              <TripProvider>
                 <AlertProvider>
                   <AppInitializer />
                 </AlertProvider>
-              </ToastProvider>
-            </TripProvider>
-          </MQTTProvider>
+              </TripProvider>
+            </MQTTProvider>
+          </ToastProvider>
         </SensorDataProvider>
       </SettingsProvider>
     </BrowserRouter>

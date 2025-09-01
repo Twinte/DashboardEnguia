@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { useSettings } from '../context/SettingsContext';
-import { useToast } from '../context/ToastContext'; // 1. Importar o hook para as notificações
+import { useToast } from '../context/ToastContext';
 import logoNorteEnergia from '../assets/logos/norteenergia.svg'; 
 import "./SettingsPage.css";
 
@@ -18,8 +18,9 @@ const availableThemes = [
 
 const SettingsPage = () => {
   const { t } = useTranslation(); 
-  const { theme, changeTheme, language, changeLanguage } = useSettings(); 
-  const { addToast } = useToast(); // 2. Chamar o hook para ter acesso à função addToast
+  // OBTÉM OS NOVOS ESTADOS DO MODO DE ENERGIA AQUI
+  const { theme, changeTheme, language, changeLanguage, energyMode, changeEnergyMode } = useSettings(); 
+  const { addToast } = useToast();
 
   const [activeCategoryKey, setActiveCategoryKey] = useState('appearance'); 
 
@@ -38,7 +39,8 @@ const SettingsPage = () => {
       ],
       battery_energy: [ 
         { labelKey: "battery_threshold", descriptionKey: "set_battery_threshold", type: "number" },
-        { labelKey: "energy_mode", descriptionKey: "select_energy_mode", type: "select", options: ["Performance", "Eco", "Balanced"] }, 
+        // ATUALIZADO: options agora em minúsculas para corresponder aos valores do estado
+        { labelKey: "energy_mode", descriptionKey: "select_energy_mode", type: "select", options: ["performance", "eco", "balanced"] }, 
       ],
       alerts: [ 
         { labelKey: "low_battery_alert", descriptionKey: "set_low_battery_alert", type: "number" },
@@ -58,16 +60,12 @@ const SettingsPage = () => {
     setActiveCategoryKey(categoryKey);
   };
 
-  // 3. Função para ser chamada ao clicar no botão de guardar
   const handleSaveChanges = () => {
-    // A lógica para guardar os dados viria aqui.
-    // Após a lógica ser concluída com sucesso, exibimos a notificação.
     addToast(t('save_changes_success_toast'), 'success');
   };
 
   return (
     <div className="settings-page">
-      {/* Sidebar Navigation */}
       <div className="settings-sidebar">
         <h3 className="sidebar-title">{t('settings')}</h3>
         <ul>
@@ -87,7 +85,6 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      {/* Main Content Area */}
       <div className="settings-content">
         <h2>{t(activeCategoryKey)} {t('settings')}</h2> 
         <div className="settings-list">
@@ -118,15 +115,21 @@ const SettingsPage = () => {
                   ))}
                 </select>
               )}
-               {setting.type === "select" && setting.options && (
-                 <select>
+
+              {/* ATUALIZAÇÃO PRINCIPAL AQUI */}
+              {setting.type === "select" && setting.options && (
+                 <select 
+                   value={setting.labelKey === 'energy_mode' ? energyMode : undefined}
+                   onChange={setting.labelKey === 'energy_mode' ? (e) => changeEnergyMode(e.target.value) : undefined}
+                 >
                    {setting.options.map((option, idx) => (
-                     <option key={idx} value={option}>
+                     <option key={idx} value={option.toLowerCase().replace(/ /g, '_')}>
                        {t(option.toLowerCase().replace(/ /g, '_')) || option} 
                      </option>
                    ))}
                  </select>
                )}
+
               {setting.type === "number" && <input type="number" />}
               {setting.type === "text" && <input type="text" />}
               {setting.type === "password" && <input type="password" />}
@@ -137,7 +140,6 @@ const SettingsPage = () => {
         </div>
          <div className="action-buttons">
            <button className="btn">{t('cancel')}</button> 
-           {/* 4. Adicionar o onClick ao botão para chamar a função */}
            <button className="btn btn-primary" onClick={handleSaveChanges}>
              {t('save_changes')}
            </button> 

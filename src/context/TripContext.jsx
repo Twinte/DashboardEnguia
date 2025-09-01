@@ -1,36 +1,34 @@
 // src/context/TripContext.jsx
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { useSensorData } from './SensorDataContext';
-import { useMQTT } from './MQTTContext'; // 1. Importar o hook do MQTT
+import { useMQTT } from './MQTTContext'; 
 import { getDistance } from '../utils/geolocation';
+import { useToast } from './ToastContext';
 
 const TripContext = createContext();
-const BOAT_ID = "barco-01"; // ID Único desta embarcação
+const BOAT_ID = "barco-01"; 
 
 export const TripProvider = ({ children }) => {
   const { sensorData } = useSensorData();
-  const { connectionStatus, connect, disconnect, publish } = useMQTT(); // 2. Usar o contexto MQTT
+  // A variável 'connectionStatus' vem do useMQTT()
+  const { connectionStatus, connect, disconnect, publish } = useMQTT(); 
+  const { addToast } = useToast();
   
   const [waypoints, setWaypoints] = useState([]);
   const [isTripActive, setIsTripActive] = useState(false);
-  
   const [traveledPath, setTraveledPath] = useState([]);
   const [distanceTraveled, setDistanceTraveled] = useState(0);
-
-  // Usamos useRef para o intervalo para evitar recriações
   const telemetryIntervalRef = useRef(null);
 
   useEffect(() => {
-    // Se a viagem está ativa, mas a conexão MQTT cai, pare de enviar
     if (isTripActive && connectionStatus !== 'connected') {
       if (telemetryIntervalRef.current) {
         clearInterval(telemetryIntervalRef.current);
         telemetryIntervalRef.current = null;
       }
     }
-    // Se a viagem está ativa e a conexão volta, reinicie o envio
     if (isTripActive && connectionStatus === 'connected' && !telemetryIntervalRef.current) {
-      telemetryIntervalRef.current = setInterval(publishTelemetry, 5000); // Envia a cada 5 segundos
+      telemetryIntervalRef.current = setInterval(publishTelemetry, 5000);
     }
   }, [isTripActive, connectionStatus]);
 
@@ -48,7 +46,6 @@ export const TripProvider = ({ children }) => {
     console.log("Telemetry Published:", payload);
   };
   
-  // Rastreamento local da posição (sem alterações)
   useEffect(() => {
     if (isTripActive && sensorData.lat && sensorData.lng) {
       const newPoint = { lat: sensorData.lat, lng: sensorData.lng, timestamp: new Date().toISOString() };
@@ -66,12 +63,11 @@ export const TripProvider = ({ children }) => {
 
   const startTrip = () => {
     if (waypoints.length < 1) return;
-    connect(); // Inicia a conexão com o Broker
+    connect();
     setTraveledPath([{ lat: sensorData.lat, lng: sensorData.lng, timestamp: new Date().toISOString() }]);
     setDistanceTraveled(0);
     setIsTripActive(true);
     
-    // Publica o status de início
     publish(`boats/${BOAT_ID}/trip/status`, {
       status: "started",
       timestamp: new Date().toISOString(),
@@ -80,13 +76,11 @@ export const TripProvider = ({ children }) => {
   };
 
   const endTrip = () => {
-    // Publica o log final completo
     publish(`boats/${BOAT_ID}/trip/log`, {
       endTime: new Date().toISOString(),
       totalDistanceKm: distanceTraveled,
       traveledPath: traveledPath,
     });
-    // Publica o status de finalização
     publish(`boats/${BOAT_ID}/trip/status`, {
       status: "completed",
       timestamp: new Date().toISOString()
@@ -97,12 +91,34 @@ export const TripProvider = ({ children }) => {
       clearInterval(telemetryIntervalRef.current);
       telemetryIntervalRef.current = null;
     }
-    // Desconecta do broker após um pequeno delay para garantir o envio das últimas mensagens
     setTimeout(() => disconnect(), 1000);
   };
   
-  // Funções de manipulação de waypoints (sem alterações, exceto pela limpeza)
-  const addWaypoint = (newWaypoint) => !isTripActive && setWaypoints(p => [...p, newWaypoint]);
+  const addWaypointInternal = (newWaypoint) => {
+    if (!isTripActive) {
+      setWaypoints(p => [...p, newWaypoint]);
+    }
+  };
+
+  const validateAndAddWaypoint = async (newWaypoint) => {
+    if (isTripActive) return;
+
+    try {
+      const response = await fetch(`https://api.onwater.io/api/v1/results/${newWaypoint.lat},${newWaypoint.lng}`);
+      const data = await response.json();
+
+      if (data.water) {
+        addWaypointInternal(newWaypoint);
+      } else {
+        addToast("Não é possível adicionar um ponto em terra.", "error");
+      }
+    } catch (error) {
+      console.error("Erro ao validar o ponto:", error);
+      addToast("Não foi possível validar o ponto. Adicionado mesmo assim.", "info");
+      addWaypointInternal(newWaypoint);
+    }
+  };
+
   const removeWaypoint = (id) => !isTripActive && setWaypoints(p => p.filter(wp => wp.id !== id));
   const clearRoute = () => {
     if (isTripActive) return;
@@ -112,8 +128,10 @@ export const TripProvider = ({ children }) => {
   };
 
   const value = {
-    waypoints, isTripActive, traveledPath, distanceTraveled, addWaypoint,
+    waypoints, isTripActive, traveledPath, distanceTraveled, 
+    addWaypoint: validateAndAddWaypoint,
     removeWaypoint, clearRoute, startTrip, endTrip,
+    // CORREÇÃO: Passar a variável 'connectionStatus' com o nome 'mqttConnectionStatus'
     mqttConnectionStatus: connectionStatus,
   };
 

@@ -1,17 +1,17 @@
 // src/context/MQTTContext.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import Paho from 'paho-mqtt';
+import { useToast } from './ToastContext'; // 1. Importar o hook do toast
 
 const MQTTContext = createContext();
 
 export const MQTTProvider = ({ children }) => {
   const [client, setClient] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
+  const { addToast } = useToast(); // 2. Chamar o hook para usar as notificações
 
-  // --- CONFIGURAÇÃO DO BROKER ATUALIZADA ---
-  // Trocamos o servidor 'test.mosquitto.org' pelo 'broker.hivemq.com', que é mais estável.
   const brokerHost = 'broker.hivemq.com';
-  const brokerPort = 8884; // O HiveMQ usa a porta 8884 para WSS
+  const brokerPort = 8884;
   const clientId = `electric_boat_dashboard_${Math.random().toString(16).substr(2, 8)}`;
 
   const connect = () => {
@@ -25,6 +25,8 @@ export const MQTTProvider = ({ children }) => {
         if (responseObject.errorCode !== 0) {
           console.error('MQTT: Conexão perdida:', responseObject.errorMessage);
           setConnectionStatus('error');
+          // 3. Adicionar notificação de erro de conexão perdida
+          addToast('Conexão MQTT perdida.', 'error');
         }
       };
 
@@ -37,12 +39,16 @@ export const MQTTProvider = ({ children }) => {
           console.log('MQTT: Conectado com sucesso!');
           setClient(newClient);
           setConnectionStatus('connected');
+          // 3. Adicionar notificação de sucesso
+          addToast('Conexão MQTT estabelecida!', 'success');
         },
         onFailure: (err) => {
           console.error('MQTT: Falha ao conectar:', err);
           setConnectionStatus('error');
+          // 3. Adicionar notificação de erro ao conectar
+          addToast('Falha ao conectar ao servidor MQTT.', 'error');
         },
-        useSSL: true, // Continuamos a usar conexão segura (wss://)
+        useSSL: true,
         timeout: 5,
         reconnect: true,
       });

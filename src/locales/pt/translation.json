@@ -67,5 +67,9 @@
   "voltage": "Voltagem",
   "current_draw": "Consumo Atual", 
   "estimated_time_remaining": "Tempo Restante Estimado",
-  "save_changes_success_toast": "Definições guardadas com sucesso!"
+  "save_changes_success_toast": "Definições guardadas com sucesso!",
+  
+  "performance_mode": "Modo Performance",
+  "eco_mode": "Modo Eco",
+  "balanced_mode": "Modo Equilibrado"
 }

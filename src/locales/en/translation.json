@@ -67,5 +67,9 @@
   "voltage": "Voltage",
   "current_draw": "Current Draw", 
   "estimated_time_remaining": "Estimated Time Remaining",
-  "save_changes_success_toast": "Settings saved successfully!"
+  "save_changes_success_toast": "Settings saved successfully!",
+  
+  "performance_mode": "Performance Mode",
+  "eco_mode": "Eco Mode",
+  "balanced_mode": "Balanced Mode"
 }

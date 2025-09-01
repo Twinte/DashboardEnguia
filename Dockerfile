@@ -12,7 +12,6 @@ RUN npm install
 
 # Copia todo o resto do código-fonte da aplicação
 COPY . .
-
 # Declara um argumento de build que podemos passar no comando docker build
 ARG VITE_API_URL
 
@@ -26,6 +25,9 @@ FROM nginx:stable-alpine
 # Copia os arquivos estáticos gerados no Estágio 1 para o diretório padrão do Nginx
 # A flag --from=build referencia o estágio anterior
 COPY --from=build /app/dist /usr/share/nginx/html
+
+# NOVO: Copia o nosso ficheiro de configuração personalizado do Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Informa ao Docker que o container escuta na porta 80
 EXPOSE 80

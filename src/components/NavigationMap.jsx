@@ -1,15 +1,14 @@
 // src/components/NavigationMap.jsx
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvent, Polyline } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMapEvent, Polyline, LayersControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-// O import do 'leaflet-routing-machine.css' já não é necessário
 
 import { FaTrash } from "react-icons/fa";
 import RecenterMap from "./RecenterMap";
 import BoatMarker from "./BoatMarker";
 import { useSensorData } from "../context/SensorDataContext";
 import { useTrip } from "../context/TripContext";
-import { getDistance } from "../utils/geolocation"; // Importar a nossa função de cálculo de distância
+import { getDistance } from "../utils/geolocation";
 import './NavigationMap.css';
 
 // Componente para capturar cliques no mapa (sem alterações)
@@ -46,7 +45,6 @@ const NavigationMap = () => {
   const [totalDistance, setTotalDistance] = useState(0);
   const [eta, setEta] = useState(0);
 
-  // Efeito para calcular a distância total da rota planeada manualmente
   useEffect(() => {
     if (waypoints.length === 0) {
       setTotalDistance(0);
@@ -56,13 +54,11 @@ const NavigationMap = () => {
     const points = [{ lat, lng }, ...waypoints];
     let calculatedDistance = 0;
     for (let i = 0; i < points.length - 1; i++) {
-      // Usa a nossa função getDistance para calcular a distância entre cada segmento
       calculatedDistance += getDistance(points[i].lat, points[i].lng, points[i + 1].lat, points[i + 1].lng);
     }
     setTotalDistance(calculatedDistance);
-  }, [waypoints, lat, lng]); // Recalcula sempre que os waypoints ou a posição inicial mudam
+  }, [waypoints, lat, lng]);
 
-  // Efeito para calcular o ETA (sem alterações significativas)
   useEffect(() => {
     if (totalDistance === 0) {
       setEta(0);
@@ -75,13 +71,15 @@ const NavigationMap = () => {
     
   }, [totalDistance, distanceTraveled, speedKPH]);
 
-  const handleMapClick = (e) => {
+  // ATUALIZAÇÃO: handleMapClick agora é uma função async
+  const handleMapClick = async (e) => {
     const newWaypoint = { lat: e.latlng.lat, lng: e.latlng.lng, id: Date.now() };
-    addWaypoint(newWaypoint);
+    // A função 'addWaypoint' que vem do useTrip() agora é a nossa nova função de validação
+    await addWaypoint(newWaypoint);
   };
 
   const routePoints = [{ lat, lng }, ...waypoints];
-  const batteryConsumption = totalDistance * 0.2; // Exemplo: 0.2 kWh por km
+  const batteryConsumption = totalDistance * 0.2;
   const isRoutePossible = batteryPercentage - batteryConsumption >= 0;
 
   return (
@@ -146,19 +144,37 @@ const NavigationMap = () => {
         <MapContainer center={[lat, lng]} zoom={mapZoom} style={{ width: "100%", height: "100%" }}>
           <MapClickHandler onClick={handleMapClick} isTripActive={isTripActive} />
           {isTripActive && <RecenterMap lat={lat} lng={lng} />}
-          <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          
+          <LayersControl position="topright">
+            <LayersControl.BaseLayer checked name="OpenStreetMap">
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+            </LayersControl.BaseLayer>
+            
+            <LayersControl.BaseLayer name="Satélite">
+              <TileLayer
+                attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              />
+            </LayersControl.BaseLayer>
+
+            <LayersControl.Overlay checked name="Informações Náuticas (OpenSeaMap)">
+              <TileLayer
+                attribution='&copy; <a href="https://www.openseamap.org/">OpenSeaMap</a> contributors'
+                url="https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png"
+              />
+            </LayersControl.Overlay>
+          </LayersControl>
           
           <BoatMarker position={[lat, lng]} heading={heading} />
 
-          {/* Rota percorrida (linha verde contínua) */}
           {isTripActive && <Polyline positions={traveledPath} color="green" weight={5} />}
           
-          {/* Rota planeada (linha azul tracejada) */}
           {!isTripActive && waypoints.length > 0 && (
             <>
-              {/* Desenha a linha de rota */}
               <Polyline positions={routePoints} color="#3388ff" weight={5} dashArray="10, 5" />
-              {/* Desenha um marcador para cada waypoint */}
               {waypoints.map(wp => <Marker key={wp.id} position={[wp.lat, wp.lng]} />)}
             </>
           )}
