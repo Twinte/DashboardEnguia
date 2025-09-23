@@ -48,7 +48,7 @@ const HomePage = () => {
             needleColor="var(--gauge-needle)" 
             needleBaseColor="var(--gauge-needle)" 
             hideText 
-            percent={sensorData.speedKPH / 60}
+            percent={sensorData.speedKPH / 100}
             arcPadding={0.02} 
             style={{ width: '300px' }} 
         />
