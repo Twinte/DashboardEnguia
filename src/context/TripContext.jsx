@@ -104,10 +104,10 @@ export const TripProvider = ({ children }) => {
     if (isTripActive) return;
 
     try {
-      const response = await fetch(`https://api.onwater.io/api/v1/results/${newWaypoint.lat},${newWaypoint.lng}`);
+      const response = await fetch(`https://is-on-water.balbona.me/api/v1/get/${newWaypoint.lat}/${newWaypoint.lng}`);
       const data = await response.json();
 
-      if (data.water) {
+      if (data.isWater) {
         addWaypointInternal(newWaypoint);
       } else {
         addToast("Não é possível adicionar um ponto em terra.", "error");
