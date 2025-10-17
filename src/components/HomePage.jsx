@@ -1,5 +1,5 @@
 // src/components/HomePage.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import GaugeChart from 'react-gauge-chart';
 import { useTranslation } from 'react-i18next';
 import { FaBatteryFull, FaTemperatureHigh } from "react-icons/fa";
@@ -10,6 +10,18 @@ import { renderSensorValue } from '../utils/formatters';
 const HomePage = () => {
   const { t } = useTranslation();
   const { sensorData, fetchError, isLoading } = useSensorData();
+  
+  // Track previous values to enable smooth transitions
+  const [prevSpeedPercent, setPrevSpeedPercent] = useState(0);
+  const [prevRpmPercent, setPrevRpmPercent] = useState(0);
+
+  // Update previous values when sensor data changes
+  useEffect(() => {
+    if (!isLoading && sensorData) {
+      setPrevSpeedPercent(sensorData.speedKPH / 100);
+      setPrevRpmPercent(sensorData.rpm / 4000);
+    }
+  }, [sensorData.speedKPH, sensorData.rpm, isLoading]);
 
   // Componente Skeleton dedicado para a HomePage
   const HomePageSkeleton = () => (
@@ -48,9 +60,11 @@ const HomePage = () => {
             needleColor="var(--gauge-needle)" 
             needleBaseColor="var(--gauge-needle)" 
             hideText 
-            percent={sensorData.speedKPH / 100}
+            percent={prevSpeedPercent}
             arcPadding={0.02} 
             style={{ width: '300px' }} 
+            animateDuration={500}
+            animate={true}
         />
         <div className="gauge-label">
           <span className="gauge-value">{renderSensorValue(sensorData.speedKPH, '', 1, fetchError)}</span>
@@ -79,9 +93,11 @@ const HomePage = () => {
             needleColor="var(--gauge-needle)" 
             needleBaseColor="var(--gauge-needle)" 
             hideText 
-            percent={sensorData.rpm / 4000}
+            percent={prevRpmPercent}
             arcPadding={0.02} 
             style={{ width: '300px' }} 
+            animateDuration={500}
+            animate={true}
         />
         <div className="gauge-label">
           <span className="gauge-value">{renderSensorValue(sensorData.rpm, '', 0, fetchError)}</span>
