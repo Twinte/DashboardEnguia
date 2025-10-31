@@ -227,6 +227,10 @@ export const TripProvider = ({ children }) => {
     addWaypoint: validateAndAddWaypoint,
     removeWaypoint, clearRoute, startTrip, endTrip,
     mqttConnectionStatus: connectionStatus,
+    
+    // ADICIONE ESTAS DUAS LINHAS
+    distanceToNextWaypoint,
+    courseToSteer
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;

@@ -10,10 +10,8 @@ import { useSensorData } from "../context/SensorDataContext";
 import { useTrip } from "../context/TripContext";
 import "./NavigationMap.css";
 
-// NOVO: componente de roteamento que calcula rota e resumo (distância/tempo)
 import RoutingMachine from "./RoutingMachine";
 
-// Componente para capturar cliques no mapa e bloquear cliques durante a viagem
 function MapClickHandler({ onClick, isTripActive }) {
   const map = useMapEvent("click", (e) => {
     if (!isTripActive) {
@@ -33,6 +31,7 @@ const NavigationMap = () => {
   const { sensorData } = useSensorData();
   const { heading, lat, lng, batteryPercentage, speedKPH } = sensorData;
 
+  // 1. OBTER OS NOVOS VALORES AQUI
   const {
     waypoints,
     isTripActive,
@@ -44,29 +43,26 @@ const NavigationMap = () => {
     startTrip,
     endTrip,
     mqttConnectionStatus,
+    distanceToNextWaypoint, // <-- NOVO
+    courseToSteer           // <-- NOVO
   } = useTrip();
 
   const [mapZoom] = useState(12);
+  const [totalDistance, setTotalDistance] = useState(0); 
+  const [eta, setEta] = useState(0); 
 
-  // Estes estados agora são atualizados pelo RoutingMachine
-  const [totalDistance, setTotalDistance] = useState(0); // km
-  const [eta, setEta] = useState(0); // horas (quando sem viagem = tempo total da rota)
-
-  // O RoutingMachine chamará esta função com { totalDistance, totalTime }
   const handleSetRouteSummary = (summary) => {
     if (summary) {
-      setTotalDistance(summary.totalDistance); // km
-      setEta(summary.totalTime); // horas (tempo total estimado)
+      setTotalDistance(summary.totalDistance); 
+      setEta(summary.totalTime); 
     } else {
       setTotalDistance(0);
       setEta(0);
     }
   };
 
-  // Durante a viagem, recalcula o ETA restante com base na velocidade atual e distância restante.
   useEffect(() => {
     if (!isTripActive || totalDistance === 0) {
-      // Sem viagem ativa: mantemos o ETA vindo do resumo da rota (totalTime)
       return;
     }
 
@@ -76,13 +72,11 @@ const NavigationMap = () => {
     setEta(timeInHours);
   }, [isTripActive, totalDistance, distanceTraveled, speedKPH]);
 
-  // Clique no mapa para adicionar waypoint (validação é feita via addWaypoint do TripContext)
   const handleMapClick = async (e) => {
     const newWaypoint = { lat: e.latlng.lat, lng: e.latlng.lng, id: Date.now() };
     await addWaypoint(newWaypoint);
   };
 
-  // Consumo simples estimado de bateria com base na distância total de rota
   const batteryConsumption = totalDistance * 0.2;
   const isRoutePossible = batteryPercentage - batteryConsumption >= 0;
 
@@ -90,6 +84,7 @@ const NavigationMap = () => {
     <div className="navigation-map-container">
       <div className="navigation-map-left">
         <div className="route-planner card">
+          {/* ... (O planejador de rota não muda) ... */}
           <h4 className="card-header">{isTripActive ? "Viagem em Andamento" : "Planejador de Rota"}</h4>
 
           <div className="waypoints-list">
@@ -169,6 +164,26 @@ const NavigationMap = () => {
                 {isRoutePossible ? "Sim" : "Não"}
               </span>
             </div>
+
+            {/* 2. ADICIONAR ESTES DOIS BLOCOS DE MÉTRICA */}
+            <div className="metric-item">
+              <span className="metric-label">
+                <strong>Dist. Próx. Ponto:</strong>
+              </span>
+              <span className="metric-value">
+                {isTripActive ? distanceToNextWaypoint.toFixed(2) : "--"} km
+              </span>
+            </div>
+            
+            <div className="metric-item">
+              <span className="metric-label">
+                <strong>Rumo a Seguir:</strong>
+              </span>
+              <span className="metric-value">
+                {isTripActive ? courseToSteer.toFixed(0) : "--"} °
+              </span>
+            </div>
+            
           </div>
         </div>
       </div>
@@ -203,15 +218,12 @@ const NavigationMap = () => {
 
           <BoatMarker position={[lat, lng]} heading={heading} />
 
-          {/* Trajeto percorrido em verde durante a viagem */}
           {isTripActive && <Polyline positions={traveledPath} color="green" weight={5} />}
 
-          {/* Roteamento preciso quando não está em viagem e há waypoints */}
           {!isTripActive && waypoints.length > 0 && (
             <RoutingMachine start={[lat, lng]} waypoints={waypoints} setRouteSummary={handleSetRouteSummary} />
           )}
 
-          {/* (Opcional) Exibir marcadores dos waypoints quando não está em viagem */}
           {!isTripActive && waypoints.map((wp) => <Marker key={wp.id} position={[wp.lat, wp.lng]} />)}
         </MapContainer>
       </div>

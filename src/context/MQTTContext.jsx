@@ -1,14 +1,14 @@
 // src/context/MQTTContext.jsx
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react'; // 1. Importar o useCallback
 import Paho from 'paho-mqtt';
-import { useToast } from './ToastContext'; // 1. Importar o hook do toast
+import { useToast } from './ToastContext';
 
 const MQTTContext = createContext();
 
 export const MQTTProvider = ({ children }) => {
   const [client, setClient] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
-  const { addToast } = useToast(); // 2. Chamar o hook para usar as notificações
+  const { addToast } = useToast();
 
   const brokerHost = 'broker.hivemq.com';
   const brokerPort = 8884;
@@ -25,7 +25,6 @@ export const MQTTProvider = ({ children }) => {
         if (responseObject.errorCode !== 0) {
           console.error('MQTT: Conexão perdida:', responseObject.errorMessage);
           setConnectionStatus('error');
-          // 3. Adicionar notificação de erro de conexão perdida
           addToast('Conexão MQTT perdida.', 'error');
         }
       };
@@ -39,13 +38,11 @@ export const MQTTProvider = ({ children }) => {
           console.log('MQTT: Conectado com sucesso!');
           setClient(newClient);
           setConnectionStatus('connected');
-          // 3. Adicionar notificação de sucesso
           addToast('Conexão MQTT estabelecida!', 'success');
         },
         onFailure: (err) => {
           console.error('MQTT: Falha ao conectar:', err);
           setConnectionStatus('error');
-          // 3. Adicionar notificação de erro ao conectar
           addToast('Falha ao conectar ao servidor MQTT.', 'error');
         },
         useSSL: true,
@@ -68,7 +65,8 @@ export const MQTTProvider = ({ children }) => {
     }
   };
 
-  const publish = (topic, payload) => {
+  // 2. Envolver a função 'publish' com useCallback
+  const publish = useCallback((topic, payload) => {
     if (client && connectionStatus === 'connected') {
       try {
         const message = new Paho.Message(JSON.stringify(payload));
@@ -81,13 +79,13 @@ export const MQTTProvider = ({ children }) => {
     } else {
       console.warn('MQTT: Cliente não conectado. Mensagem não publicada.', { topic, payload });
     }
-  };
+  }, [client, connectionStatus]); // 3. Adicionar as dependências
 
   const value = {
     connectionStatus,
     connect,
     disconnect,
-    publish,
+    publish, // Esta função agora é estável
   };
 
   return <MQTTContext.Provider value={value}>{children}</MQTTContext.Provider>;
