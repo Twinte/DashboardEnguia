@@ -19,13 +19,15 @@ import './PowerPage.css';
 
 const PowerPage = () => {
   const { t } = useTranslation();
-  const { sensorData } = useSensorData();
+  const { sensorData } = useSensorData(); // Obtém todos os dados do sensor
 
+  // NOVO: Extrai os valores do sensorData, usando 0 como fallback
   const percentage = sensorData?.batteryPercentage || 0;
   const voltage = sensorData?.batteryVoltage || 0;
   const temperature = sensorData?.temp || 0;
-  const currentDraw = 15.5; // Valor de exemplo
-  const timeRemaining = 5.2; // Valor de exemplo em horas
+  const currentDraw = sensorData?.currentDraw || 0; // <-- USA O VALOR REAL
+  
+  const timeRemaining = 5.2; // Valor de exemplo em horas (ainda estático)
 
   // 2. Lógica para escolher o ícone e a cor da bateria
   const getBatteryStyle = () => {
@@ -80,6 +82,7 @@ const PowerPage = () => {
             <IoBarChart className="detail-icon" style={{ color: '#3498db' }} />
             <div className="detail-text">
               <span className="detail-label">{t('current_draw')}</span>
+              {/* Esta linha agora mostra o valor real */}
               <span className="detail-value">{renderSensorValue(currentDraw, ' A', 1)}</span>
             </div>
           </div>

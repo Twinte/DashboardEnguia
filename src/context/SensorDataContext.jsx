@@ -20,6 +20,7 @@ export const SensorDataProvider = ({ children }) => {
     heading: 0,
     lat: INITIAL_LATITUDE,
     lng: INITIAL_LONGITUDE,
+    currentDraw: 0, // NOVO: Adicionado estado inicial para corrente
   });
   const [fetchError, setFetchError] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Estado para controlar o carregamento inicial
@@ -72,6 +73,9 @@ export const SensorDataProvider = ({ children }) => {
             // Se a API enviar lat/lng, eles sobrepõem a localização do utilizador.
             ...(data.lat && { lat: parseFloat(data.lat) }),
             ...(data.lng && { lng: parseFloat(data.lng) }),
+            
+            // NOVO: Ler o dado de Corrente da API
+            ...(data.Corrente_A && { currentDraw: parseFloat(data.Corrente_A) }),
           }));
           // Desativa o 'isLoading' apenas após a primeira busca bem-sucedida
           if (isLoading) setIsLoading(false);

@@ -19,16 +19,14 @@ export const TripProvider = ({ children }) => {
   const [traveledPath, setTraveledPath] = useState([]);
   const [distanceTraveled, setDistanceTraveled] = useState(0);
   const telemetryIntervalRef = useRef(null);
+  
+  const [tripId, setTripId] = useState(null);
 
   const [distanceToNextWaypoint, setDistanceToNextWaypoint] = useState(0);
   const [courseToSteer, setCourseToSteer] = useState(0);
 
-  // --- INÍCIO DA CORREÇÃO ---
-  // Criamos um 'ref' para guardar os dados mais recentes.
-  // Refs podem ser atualizados à vontade sem causar re-renderizações.
   const telemetryDataRef = useRef({});
 
-  // Atualizamos o 'ref' sempre que os dados dos sensores ou de navegação mudarem.
   useEffect(() => {
     telemetryDataRef.current = {
       lat: sensorData.lat,
@@ -36,18 +34,23 @@ export const TripProvider = ({ children }) => {
       speedKPH: sensorData.speedKPH,
       heading: sensorData.heading,
       courseToSteer: courseToSteer,
-      distanceToNextWaypoint: distanceToNextWaypoint
+      distanceToNextWaypoint: distanceToNextWaypoint,
+      rpm: sensorData.rpm,
+      batteryPercentage: sensorData.batteryPercentage,
+      batteryVoltage: sensorData.batteryVoltage,
+      temperature: sensorData.temp,
+      windSpeed: sensorData.windSpeed,
+      tripId: tripId,
+      // NOVO: Adiciona a corrente ao ref
+      currentDraw: sensorData.currentDraw
     };
-  }, [sensorData, courseToSteer, distanceToNextWaypoint]);
+  }, [sensorData, courseToSteer, distanceToNextWaypoint, tripId]);
 
-  // Agora, a função 'publishTelemetry' lê os dados do 'ref'.
-  // A sua única dependência é a função 'publish' do MQTTContext,
-  // que é estável e não muda.
   const publishTelemetry = useCallback(() => {
-    // Lê os dados mais recentes de dentro do 'ref'
     const currentData = telemetryDataRef.current;
     
     const payload = {
+      tripId: currentData.tripId,
       timestamp: new Date().toISOString(),
       coordinates: {
         lat: currentData.lat,
@@ -56,37 +59,53 @@ export const TripProvider = ({ children }) => {
       speedKPH: currentData.speedKPH,
       heading: currentData.heading,
       courseToSteer: currentData.courseToSteer,
-      distanceToNextWaypoint: currentData.distanceToNextWaypoint
+      distanceToNextWaypoint: currentData.distanceToNextWaypoint,
+
+      rpm: currentData.rpm,
+      temperature: currentData.temperature,
+      windSpeed: currentData.windSpeed,
+      // NOVO: Adiciona a corrente ao payload
+      currentDraw: currentData.currentDraw, 
+      battery: {
+        percentage: currentData.batteryPercentage,
+        voltage: currentData.batteryVoltage
+      }
     };
     
     publish(`boats/${BOAT_ID}/telemetry/live`, payload);
     console.log("Telemetry Published:", payload);
-  }, [publish]); // A função agora é estável
-
-  // --- FIM DA CORREÇÃO ---
+  }, [publish]); 
 
 
   const endTrip = useCallback(() => {
-    publish(`boats/${BOAT_ID}/trip/log`, {
+    const logPayload = {
+      tripId: tripId,
       endTime: new Date().toISOString(),
       totalDistanceKm: distanceTraveled,
       traveledPath: traveledPath,
-    });
-    publish(`boats/${BOAT_ID}/trip/status`, {
+    };
+    publish(`boats/${BOAT_ID}/trip/log`, logPayload);
+    console.log("Trip Log Published:", logPayload);
+
+    const statusPayload = {
+      tripId: tripId,
       status: "completed",
       timestamp: new Date().toISOString()
-    });
+    };
+    publish(`boats/${BOAT_ID}/trip/status`, statusPayload);
+    console.log("Trip Status 'Completed' Published:", statusPayload);
+
 
     setIsTripActive(false);
+    setTripId(null);
     if (telemetryIntervalRef.current) {
       clearInterval(telemetryIntervalRef.current);
       telemetryIntervalRef.current = null;
     }
     setTimeout(() => disconnect(), 1000); 
-  }, [publish, distanceTraveled, traveledPath, disconnect]);
+  }, [publish, distanceTraveled, traveledPath, disconnect, tripId]); 
 
 
-  // Este useEffect agora funciona corretamente, pois 'publishTelemetry' é estável.
   useEffect(() => {
     if (isTripActive && connectionStatus === 'connected') {
       if (!telemetryIntervalRef.current) {
@@ -107,7 +126,6 @@ export const TripProvider = ({ children }) => {
   }, [isTripActive, connectionStatus, publishTelemetry]);
 
   
-  // Efeito principal de navegação (cálculo e auto-avanço)
   useEffect(() => {
     if (!isTripActive || !sensorData.lat || !sensorData.lng) return;
 
@@ -132,7 +150,6 @@ export const TripProvider = ({ children }) => {
 
       if (dist < WAYPOINT_THRESHOLD_KM) {
         console.log(`Chegou ao waypoint: ${nextWaypoint.id}. A avançar...`);
-        // Usamos o número de waypoints para saber qual ponto foi
         const pointNumber = (traveledPath[0]?.lat === waypoints[0].lat) ? 1 : (traveledPath.length > 0 ? traveledPath.length : 1);
         addToast(`A chegar ao Ponto ${pointNumber}. Próximo ponto.`, 'info');
         
@@ -150,7 +167,6 @@ export const TripProvider = ({ children }) => {
   }, [isTripActive, sensorData.lat, sensorData.lng, sensorData.heading, waypoints, addToast, endTrip, traveledPath]);
 
   
-  // Efeito para adicionar a distância percorrida
   useEffect(() => {
     if (isTripActive && sensorData.lat && sensorData.lng) {
       const newPoint = { lat: sensorData.lat, lng: sensorData.lng, timestamp: new Date().toISOString() };
@@ -167,19 +183,26 @@ export const TripProvider = ({ children }) => {
   }, [isTripActive, sensorData.lat, sensorData.lng]);
 
 
-  // Funções de controlo de rota
   const startTrip = useCallback(() => {
     if (waypoints.length < 1) return;
+    
+    const newTripId = `trip-${Date.now()}`;
+    setTripId(newTripId);
+    
     connect(); 
     setTraveledPath([{ lat: sensorData.lat, lng: sensorData.lng, timestamp: new Date().toISOString() }]); 
     setDistanceTraveled(0);
     setIsTripActive(true);
     
-    publish(`boats/${BOAT_ID}/trip/status`, {
+    const payload = {
+      tripId: newTripId,
       status: "started",
       timestamp: new Date().toISOString(),
       plannedRoute: waypoints
-    });
+    };
+    publish(`boats/${BOAT_ID}/trip/status`, payload);
+    console.log("Trip Status 'Started' Published:", payload);
+
   }, [connect, publish, waypoints, sensorData.lat, sensorData.lng]);
   
   const addWaypointInternal = (newWaypoint) => {
@@ -221,16 +244,15 @@ export const TripProvider = ({ children }) => {
   }, [isTripActive]);
 
 
-  // Valor fornecido pelo Contexto
   const value = {
     waypoints, isTripActive, traveledPath, distanceTraveled, 
     addWaypoint: validateAndAddWaypoint,
     removeWaypoint, clearRoute, startTrip, endTrip,
     mqttConnectionStatus: connectionStatus,
     
-    // ADICIONE ESTAS DUAS LINHAS
     distanceToNextWaypoint,
-    courseToSteer
+    courseToSteer,
+    tripId
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;
