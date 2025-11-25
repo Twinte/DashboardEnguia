@@ -2,111 +2,132 @@
 import React, { useState, useEffect } from 'react';
 import GaugeChart from 'react-gauge-chart';
 import { useTranslation } from 'react-i18next';
-import { FaBatteryFull, FaTemperatureHigh } from "react-icons/fa";
-import { WiStrongWind } from "react-icons/wi";
 import { useSensorData } from '../context/SensorDataContext';
-import { renderSensorValue } from '../utils/formatters';
+import './HomePage.css'; // <--- IMPORT THE NEW CSS FILE HERE
 
 const HomePage = () => {
   const { t } = useTranslation();
-  const { sensorData, fetchError, isLoading } = useSensorData();
+  const { sensorData, isLoading } = useSensorData();
   
-  // Track previous values to enable smooth transitions
   const [prevSpeedPercent, setPrevSpeedPercent] = useState(0);
   const [prevRpmPercent, setPrevRpmPercent] = useState(0);
 
-  // Update previous values when sensor data changes
   useEffect(() => {
     if (!isLoading && sensorData) {
-      setPrevSpeedPercent(sensorData.speedKPH / 100);
-      setPrevRpmPercent(sensorData.rpm / 4000);
+      // Calculate percentages for the gauge visual (0.0 to 1.0)
+      // Assuming max speed 100 KPH and max RPM 4000
+      setPrevSpeedPercent(Math.min(sensorData.speedKPH / 100, 1));
+      setPrevRpmPercent(Math.min(sensorData.rpm / 4000, 1));
     }
   }, [sensorData.speedKPH, sensorData.rpm, isLoading]);
 
-  // Componente Skeleton dedicado para a HomePage
-  const HomePageSkeleton = () => (
-    <div className="dash-content">
-      <div className="gauge-wrapper">
-        <div className="skeleton skeleton-circle" style={{ width: '300px', height: '180px' }}></div>
-        <div className="skeleton skeleton-gauge-label"></div>
-        <div className="skeleton skeleton-text" style={{ width: '150px', height: '30px', marginTop: '1rem', borderRadius: '4px' }}></div>
-      </div>
-      <div className="wind-speed-wrapper">
-          <div className="skeleton skeleton-text" style={{ width: '120px', height: '2rem', borderRadius: '4px' }}></div>
-          <div className="skeleton skeleton-text" style={{ width: '80px', height: '2.5rem', marginTop: '0.5rem', borderRadius: '4px' }}></div>
-      </div>
-      <div className="gauge-wrapper">
-        <div className="skeleton skeleton-circle" style={{ width: '300px', height: '180px' }}></div>
-        <div className="skeleton skeleton-gauge-label"></div>
-        <div className="skeleton skeleton-text" style={{ width: '150px', height: '25px', marginTop: '0.75rem', borderRadius: '4px' }}></div>
-      </div>
-    </div>
-  );
-
-  // Se estiver a carregar, mostra o skeleton
+  // Simple loading state
   if (isLoading) {
-    return <HomePageSkeleton />;
+    return <div className="loading-screen">SYSTEM INITIALIZING...</div>;
   }
 
-  // Se não estiver a carregar, mostra o conteúdo real
   return (
-    <div className="dash-content">
-      <div className="gauge-wrapper">
-        <GaugeChart 
-            id="speed-gauge" 
-            nrOfLevels={10} 
-            arcsLength={[0.4, 0.3, 0.3]} 
-            colors={["#2ECC71", "#F1C40F", "#E74C3C"]}
-            needleColor="var(--gauge-needle)" 
-            needleBaseColor="var(--gauge-needle)" 
-            hideText 
-            percent={prevSpeedPercent}
-            arcPadding={0.02} 
-            style={{ width: '300px' }} 
-            animateDuration={500}
-            animate={true}
-        />
-        <div className="gauge-label">
-          <span className="gauge-value">{renderSensorValue(sensorData.speedKPH, '', 1, fetchError)}</span>
-          <span className="gauge-unit">KPH</span>
+    <div className="home-grid">
+      
+      {/* --- LEFT COLUMN: SPEED GAUGE --- */}
+      <div className="gauge-section left">
+        <div className="gauge-ring">
+           <GaugeChart 
+              id="speed-gauge" 
+              nrOfLevels={20} 
+              // Green -> Yellow -> Red colors
+              colors={["#2ECC71", "#F1C40F", "#E74C3C"]} 
+              arcWidth={0.3} 
+              percent={prevSpeedPercent} 
+              needleColor="var(--gauge-needle)"
+              needleBaseColor="var(--gauge-needle)"
+              textColor="transparent" // Hide default text
+              hideText={true} 
+              animate={true}
+           />
+           {/* Custom Text Overlay */}
+           <div className="gauge-inner-text">
+             <span className="value-large">{parseFloat(sensorData.speedKPH).toFixed(0)}</span>
+             <span className="unit-label">KPH</span>
+           </div>
         </div>
-        <div className="battery-bar">
-          <span className="battery-bar-title"><FaBatteryFull /> {t('battery')}</span>
-          <div className="battery-bar-track">
-            <div className="battery-bar-fill" style={{ width: `${sensorData.batteryPercentage}%` }} />
-          </div>
-          <span className="battery-percentage-label">{renderSensorValue(sensorData.batteryPercentage, '%', 0, fetchError)}</span>
-        </div>
-      </div>
-      <div className="wind-speed-wrapper">
-        <div className="wind-speed-display">
-          <div className="wind-speed-header"><WiStrongWind size={32} /> <span className="wind-speed-label">{t('wind_speed')}</span></div>
-          <span className="wind-speed-value">{renderSensorValue(sensorData.windSpeed, ' kts', 0, fetchError)}</span>
-        </div>
-      </div>
-      <div className="gauge-wrapper">
-        <GaugeChart 
-            id="rpm-gauge" 
-            nrOfLevels={10} 
-            arcsLength={[0.6, 0.2, 0.2]} 
-            colors={["#2ECC71", "#F1C40F", "#E74C3C"]}
-            needleColor="var(--gauge-needle)" 
-            needleBaseColor="var(--gauge-needle)" 
-            hideText 
-            percent={prevRpmPercent}
-            arcPadding={0.02} 
-            style={{ width: '300px' }} 
-            animateDuration={500}
-            animate={true}
-        />
-        <div className="gauge-label">
-          <span className="gauge-value">{renderSensorValue(sensorData.rpm, '', 0, fetchError)}</span>
-          <span className="gauge-unit">RPM</span>
-        </div>
-        <div className="temperature-display">
-          <FaTemperatureHigh/> <span>{t('temperature')}: {renderSensorValue(sensorData.temp, '°C', 0, fetchError)}</span>
+        
+        {/* Fake Fuel Bar (Visual Only based on Battery for now) */}
+        <div className="gauge-footer-bar">
+           <div className="bar-track">
+              <div 
+                className="bar-fill" 
+                style={{ width: `${sensorData.batteryPercentage}%`, backgroundColor: sensorData.batteryPercentage < 20 ? '#E74C3C' : '#2ECC71' }}
+              ></div>
+           </div>
+           <div className="bar-labels">
+              <span>E</span>
+              <span>FUEL (BAT)</span>
+              <span>F</span>
+           </div>
         </div>
       </div>
+
+      {/* --- CENTER COLUMN: LOGO & INFO --- */}
+      <div className="center-section">
+         <div className="logo-area">
+            <span className="logo-text">ENGUIA</span>
+         </div>
+         
+         {/* Central Bubble: Showing Wind or Oil Pressure */}
+         <div className="central-info-bubble">
+            <span className="bubble-label">{t('wind_speed')}</span>
+            <span className="bubble-value">{sensorData.windSpeed}</span>
+            <span className="bubble-unit">KTS</span>
+         </div>
+
+         {/* Trim Indicators (Static/Visual for layout) */}
+         <div className="trim-controls">
+            <span className="trim-label">TRIM</span>
+            <div className="trim-indicators">
+               <div className="trim-bar"><div className="trim-fill" style={{height: '60%'}}></div></div>
+               <div className="trim-bar"><div className="trim-fill" style={{height: '60%'}}></div></div>
+            </div>
+         </div>
+      </div>
+
+      {/* --- RIGHT COLUMN: RPM GAUGE --- */}
+      <div className="gauge-section right">
+        <div className="gauge-ring">
+           <GaugeChart 
+              id="rpm-gauge" 
+              nrOfLevels={20} 
+              colors={["#00A3FF", "#2ECC71", "#E74C3C"]} 
+              arcWidth={0.3} 
+              percent={prevRpmPercent} 
+              needleColor="var(--gauge-needle)"
+              needleBaseColor="var(--gauge-needle)"
+              hideText={true}
+              animate={true}
+           />
+           <div className="gauge-inner-text">
+             <span className="value-large">{sensorData.rpm}</span>
+             <span className="unit-label">RPM</span>
+           </div>
+        </div>
+
+        {/* Temp Bar */}
+        <div className="gauge-footer-bar">
+           <div className="bar-track">
+              {/* Simulating Temp bar fill roughly based on 0-100C */}
+              <div 
+                className="bar-fill" 
+                style={{ width: `${Math.min(sensorData.temp, 100)}%`, backgroundColor: sensorData.temp > 80 ? '#E74C3C' : '#00A3FF' }}
+              ></div>
+           </div>
+           <div className="bar-labels">
+              <span>C</span>
+              <span>TEMP {sensorData.temp}°</span>
+              <span>H</span>
+           </div>
+        </div>
+      </div>
+
     </div>
   );
 };
