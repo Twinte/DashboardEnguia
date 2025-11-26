@@ -1,256 +1,349 @@
 /* src/components/SettingsPage.css */
+
 .settings-page {
   display: flex;
-  height: 100%;
   width: 100%;
+  height: 100%;
+  /* Ensure it sits behind the bottom nav dock */
+  padding-bottom: 10vh; 
+  gap: 2vw;
+  padding-top: 2vh;
+  padding-left: 2vw;
+  padding-right: 2vw;
+  box-sizing: border-box;
 }
 
+/* --- SIDEBAR MENU --- */
 .settings-sidebar {
-  width: 20%; /* Largura da Sidebar */
-  background-color: var(--background-nav);
-  color: var(--text-primary);
-  padding: 1rem;
-  border-right: 2px solid var(--border-color);
+  width: 25vw;
+  min-width: 250px;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(10, 25, 47, 0.9) 0%, rgba(10, 25, 47, 0.6) 100%);
+  border: 1px solid rgba(0, 163, 255, 0.2);
+  border-left: 4px solid var(--neon-blue); /* Tech accent */
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  padding: 3vh 1.5vw;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 .sidebar-title {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: var(--text-primary);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 4vh;
+  text-shadow: 0 0 10px rgba(0, 163, 255, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1vh;
 }
 
 .settings-sidebar ul {
-  list-style-type: none;
+  list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
 }
 
 .settings-sidebar li {
-  padding: 10px 15px;
+  padding: 1.5vh 1vw;
   cursor: pointer;
-  transition: background-color 0.3s ease;
   font-size: 1.1rem;
-  border-radius: 6px;
-  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   color: var(--text-secondary);
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  border-right: 2px solid transparent; /* Hidden indicator */
 }
 
 .settings-sidebar li:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
+  background: rgba(0, 163, 255, 0.1);
+  color: #fff;
+  padding-left: 1.5vw; /* Slight slide effect */
 }
+
 .settings-sidebar li.active {
-  background-color: var(--button-bg);
-  color: var(--text-primary);
-  font-weight: 600;
+  background: linear-gradient(90deg, rgba(0, 163, 255, 0.15) 0%, transparent 100%);
+  color: var(--neon-blue);
+  border-right-color: var(--neon-blue);
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(0, 163, 255, 0.4);
 }
 
 .logo-profile-section {
+  margin-top: auto;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  padding: 1rem 0;
+  padding-top: 2vh;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .sidebar-logo {
-  max-width: 80%;
-  max-height: 100px;
+  /* Increased size per feedback */
+  max-width: 220px; /* Previously 120px */
+  width: 90%; /* Fills the sidebar width better */
   height: auto;
-  object-fit: contain;
+  
+  /* Removed opacity for full visibility */
+  opacity: 1; 
+  
+  /* Enhanced glow to make it pop */
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+  
+  transition: all 0.3s ease;
 }
 
+.sidebar-logo:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 15px rgba(0, 163, 255, 0.6)); /* Blue neon glow on hover */
+}
+
+/* --- MAIN CONTENT AREA --- */
 .settings-content {
-  width: 80%;
-  padding: 1.5rem;
-  background-color: var(--background-secondary);
-  color: var(--text-primary);
+  flex: 1;
+  background: rgba(10, 25, 47, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 4vh 4vw;
   overflow-y: auto;
+  position: relative;
 }
 
+/* Header "SETTINGS // CATEGORY" */
 .settings-content h2 {
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.75rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 2.5rem;
+  color: #fff;
+  text-transform: uppercase;
+  margin-bottom: 4vh;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
+.settings-content h2::before {
+  content: '//';
+  color: var(--neon-blue);
+  font-size: 2rem;
+}
+
+/* --- SETTING ITEMS (CARDS) --- */
 .settings-list {
-  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2vh;
 }
 
-/* A classe .setting-item agora é um .card, mas mantemos o espaçamento */
 .setting-item {
-  margin-bottom: 1.25rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 2vh 2vw;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row; /* Align label left, input right */
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.3s;
 }
 
-/* O padding e a borda agora vêm da classe .card */
-/* Apenas mantemos os estilos para os elementos INTERNOS */
+.setting-item:hover {
+  border-color: rgba(0, 163, 255, 0.3);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Labels and Desc */
+.setting-info {
+  display: flex;
+  flex-direction: column;
+  max-width: 60%;
+}
+
 .setting-item h3 {
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   font-size: 1.1rem;
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: 1px;
 }
 
 .setting-item p {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  margin-bottom: 0.75rem;
+  margin: 0.5vh 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
 }
 
-.setting-item input[type="text"],
-.setting-item input[type="password"],
-.setting-item input[type="number"],
-.setting-item input[type="color"],
-.setting-item select {
-  margin-top: 5px;
-  padding: 8px 10px;
-  background-color: var(--background-primary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  width: 100%;
-  max-width: 300px;
-  box-sizing: border-box;
-}
-.setting-item input[type="color"] {
-  padding: 2px;
-  height: 40px;
-  max-width: 100px;
+/* --- CUSTOM INPUTS --- */
+
+/* 1. Text & Number Inputs */
+.setting-input-wrapper input[type="text"],
+.setting-input-wrapper input[type="password"],
+.setting-input-wrapper input[type="number"] {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  color: var(--neon-blue);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2rem;
+  padding: 5px 10px;
+  text-align: right;
+  width: 200px;
+  transition: all 0.3s;
 }
 
-
-.setting-item input[type="checkbox"].toggle-switch {
-  width: auto;
-  max-width: none;
-  margin-right: 0.5rem;
-  vertical-align: middle;
+.setting-input-wrapper input:focus {
+  outline: none;
+  border-bottom-color: var(--neon-blue);
+  box-shadow: 0 4px 4px -4px var(--neon-blue);
 }
 
-/* Os estilos dos botões foram removidos daqui */
+/* 2. Select Dropdowns */
+.setting-input-wrapper select {
+  background: rgba(5, 11, 20, 0.9);
+  border: 1px solid var(--neon-blue);
+  color: #fff;
+  padding: 0.5rem 2rem 0.5rem 1rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  text-transform: uppercase;
+  border-radius: 4px;
+  cursor: pointer;
+  appearance: none; /* Remove default arrow */
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300A3FF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem top 50%;
+  background-size: 0.65rem auto;
+}
+
+.setting-input-wrapper select:focus {
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 163, 255, 0.3);
+}
+
+/* 3. Neon Toggle Switch */
+.toggle-switch {
+  appearance: none;
+  width: 50px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #8FA3BC;
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), background 0.3s;
+}
+
+.toggle-switch:checked {
+  background: rgba(0, 163, 255, 0.2);
+  border-color: var(--neon-blue);
+}
+
+.toggle-switch:checked::after {
+  transform: translateX(24px);
+  background: var(--neon-blue);
+  box-shadow: 0 0 10px var(--neon-blue);
+}
+
+/* --- BUTTONS --- */
 .action-buttons {
-  margin-top: 20px;
+  margin-top: 4vh;
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 1rem;
 }
 
-/* ======================================================= */
-/* ======== ESTILOS RESPONSIVOS PARA SETTINGS PAGE ======== */
-/* ======================================================= */
-@media (max-width: 992px) {
+.action-buttons .btn {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 30px;
+  background: transparent;
+  border: 1px solid var(--text-secondary);
+  color: var(--text-secondary);
+  transition: all 0.3s;
+}
+
+.action-buttons .btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: #fff;
+}
+
+.action-buttons .btn-primary {
+  border-color: var(--neon-blue);
+  color: var(--neon-blue);
+  background: rgba(0, 163, 255, 0.1);
+}
+
+.action-buttons .btn-primary:hover {
+  background: var(--neon-blue);
+  color: #000;
+  box-shadow: 0 0 20px rgba(0, 163, 255, 0.4);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 900px) {
+  .settings-page {
+    flex-direction: column;
+    padding-bottom: 15vh;
+  }
   .settings-sidebar {
-    max-height: none;
-  }
-  .logo-profile-section {
-    margin-top: 1rem;
-    padding-bottom: 0;
-  }
-  .sidebar-logo {
-    max-height: 80px;
-  }
-  .settings-content {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    overflow-x: auto;
+    align-items: center;
+    border-right: none;
+    border-bottom: 1px solid var(--neon-blue);
     padding: 1rem;
   }
-  .settings-content h2 {
-    font-size: 1.3rem;
-  }
-}
-
-@media (max-width: 600px) {
   .sidebar-title {
-    font-size: 1.3rem;
-  }
-  .settings-sidebar li {
-    font-size: 1rem;
-    padding: 8px 10px;
-  }
-  .logo-profile-section {
-    padding: 0.5rem 0;
-  }
-  .sidebar-logo {
-    max-height: 60px;
-  }
-  .settings-content {
-    padding: 0.75rem;
-  }
-  .settings-content h2 {
     font-size: 1.2rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
+    margin: 0;
+    border: none;
+    margin-right: 1rem;
   }
-  .setting-item {
-    margin-bottom: 1rem;
-  }
-  .setting-item h3 {
-    font-size: 1rem;
-  }
-  .setting-item p {
-    font-size: 0.85rem;
-    margin-bottom: 0.5rem;
-  }
-  .setting-item input[type="text"],
-  .setting-item input[type="password"],
-  .setting-item input[type="number"],
-  .setting-item input[type="color"],
-  .setting-item select {
-    padding: 6px 8px;
-    font-size: 0.9rem;
-  }
-  .action-buttons {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .action-buttons button {
-    width: 100%;
-  }
-}
-
-@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
-  .settings-sidebar {
-    padding: 0.5rem;
-    justify-content: flex-start;
-  }
-  .sidebar-title {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
+  .settings-sidebar ul {
+    flex-direction: row;
+    gap: 1rem;
   }
   .settings-sidebar li {
-    font-size: 0.75rem;
-    padding: 0.3rem 0.4rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
   }
   .logo-profile-section {
-    padding: 0.5rem 0 0 0;
-    margin-top: auto;
-  }
-  .sidebar-logo {
-    max-height: 50px;
-  }
-  .settings-content {
-    padding: 0.5rem 0.75rem;
-  }
-  .settings-content h2 {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.3rem;
+    display: none; /* Hide logo on mobile settings to save space */
   }
   .setting-item {
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
-  .setting-item h3 {
-    font-size: 0.85rem;
+  .setting-info {
+    max-width: 100%;
   }
-  .setting-item p {
-    font-size: 0.7rem;
-    margin-bottom: 0.3rem;
-  }
-  .action-buttons {
-    margin-top: 0.5rem;
-  }
-  .action-buttons button {
-    padding: 4px 8px;
-    font-size: 0.75rem;
+  .setting-input-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
   }
 }

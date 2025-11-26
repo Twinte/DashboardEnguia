@@ -1,167 +1,190 @@
 /* src/components/PowerPage.css */
 
-.power-page-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.power-container {
   width: 100%;
   height: 100%;
-  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* Left Panels | Core | Right Panels */
+  align-items: center;
+  justify-content: center;
+  padding: 0 2vw 8vh 2vw; /* Bottom padding for nav bar */
+  gap: 3vw;
 }
 
-.power-card {
-  width: 100%;
-  max-width: 700px;
+/* --- CENTRAL POWER CORE --- */
+.power-core-section {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 2rem;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
-/* Secção principal com percentagem e barra */
-.main-battery-info {
+.power-ring-container {
+  position: relative;
+  width: 45vh; /* Responsive size based on height */
+  height: 45vh;
+  max-width: 400px;
+  max-height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Rotating Outer Ring */
+.reactor-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: var(--neon-blue);
+  border-bottom-color: rgba(0, 163, 255, 0.3);
+  animation: spin 10s linear infinite;
+  box-shadow: 0 0 30px rgba(0, 163, 255, 0.1);
+}
+
+/* Inner Static Ring */
+.reactor-ring-inner {
+  position: absolute;
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+/* The Central Value */
+.core-value {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+.core-percentage {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(4rem, 8vh, 7rem);
+  font-weight: 700;
+  color: #fff;
+  line-height: 0.9;
+  text-shadow: 0 0 20px var(--neon-green);
+}
+
+.core-label {
+  font-size: clamp(1rem, 1.5vh, 1.5rem);
+  letter-spacing: 3px;
+  color: var(--text-secondary);
+  margin-top: 5px;
+}
+
+/* Battery Icon Indicator */
+.core-icon {
+  font-size: 2rem;
+  color: var(--neon-green);
+  margin-bottom: 1vh;
+  filter: drop-shadow(0 0 8px var(--neon-green));
+}
+
+/* --- SIDE PANELS (HUD CARDS) --- */
+.power-side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 3vh;
+  width: 100%;
+}
+
+.hud-card {
+  background: rgba(10, 25, 47, 0.6);
+  border: 1px solid rgba(0, 163, 255, 0.2);
+  border-left: 4px solid var(--neon-blue); /* Accent border */
+  padding: 2vh 1.5vw;
+  border-radius: 10px;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1.5rem;
-}
-
-.battery-level {
-  display: flex;
-  align-items: center; /* Alinha o ícone e o texto verticalmente */
-  gap: 1rem; /* Espaço entre o ícone e o número */
-  color: var(--text-primary);
-}
-
-/* NOVO: Estilo para o ícone da bateria */
-.battery-icon {
-  font-size: 4rem; /* Tamanho do ícone para corresponder ao texto */
-  line-height: 1;
-}
-
-/* NOVO: Container para o texto da percentagem */
-.battery-text {
-  display: flex;
-  align-items: baseline;
-}
-
-.battery-percentage {
-  font-size: 5rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.percentage-symbol {
-  font-size: 2rem;
-  font-weight: 600;
-  margin-left: 0.5rem;
-  opacity: 0.8;
-}
-
-.battery-bar-container {
-  flex-grow: 1;
-}
-
-.battery-bar-track {
-  width: 100%;
-  height: 12px;
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 6px;
+  justify-content: space-between;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  position: relative;
   overflow: hidden;
 }
 
-.battery-bar-fill {
-  height: 100%;
-  border-radius: 6px;
-  transition: width 0.5s ease-out, background-color 0.5s ease;
+.hud-card:hover {
+  background: rgba(10, 25, 47, 0.8);
+  box-shadow: 0 0 15px rgba(0, 163, 255, 0.2);
+  border-color: var(--neon-blue);
 }
 
-.battery-bar-label {
-  display: block;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  text-align: left;
-}
-
-/* Grelha para detalhes */
-.power-details-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-}
-
-.detail-item {
-  display: flex;
-  align-items: center;
-  background-color: var(--background-secondary);
-  padding: 1rem;
-  border-radius: 8px;
-}
-
-.detail-icon {
+.hud-card-icon {
   font-size: 2.5rem;
-  margin-right: 1rem;
-  flex-shrink: 0;
-}
-
-.detail-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.detail-label {
-  font-size: 0.9rem;
   color: var(--text-secondary);
-  margin-bottom: 0.25rem;
+  opacity: 0.5;
 }
 
-.detail-value {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-primary);
+.hud-card-info {
+  text-align: right;
 }
 
-/* Responsividade */
-@media (max-width: 600px) {
-  .power-card {
-    padding: 1rem;
-    gap: 1.5rem;
+.hud-label {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 0.5vh;
+}
+
+.hud-value {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.hud-unit {
+  font-size: 1rem;
+  color: var(--neon-blue);
+  margin-left: 5px;
+}
+
+/* Color Variations based on context */
+.hud-card.danger {
+  border-left-color: var(--neon-orange);
+}
+.hud-card.danger .hud-value {
+  color: var(--neon-orange);
+  text-shadow: 0 0 10px rgba(255, 159, 0, 0.4);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mobile Layout */
+@media (max-width: 900px) {
+  .power-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    height: auto;
+    padding-bottom: 12vh;
+    overflow-y: auto;
   }
-
-  .main-battery-info {
+  
+  .power-core-section {
+    order: -1; /* Core on top */
+    margin-bottom: 2rem;
+  }
+  
+  .power-side-panel {
+    display: flex;
     flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-  
-  .battery-level {
-    flex-direction: row; /* Mantém o ícone ao lado do texto */
-  }
-  
-  .battery-icon {
-    font-size: 3rem; /* Ícone um pouco menor em mobile */
-  }
-
-  .battery-percentage {
-    font-size: 4rem;
-  }
-
-  .battery-bar-container {
+    gap: 2vh; /* Reduced from 3vh to fit 3 items comfortably */
     width: 100%;
   }
-
-  .battery-bar-label {
-    text-align: center;
-  }
-
-  .power-details-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .detail-value {
-    font-size: 1.3rem;
+  
+  .hud-card {
+    flex: 1;
+    min-width: 140px;
   }
 }

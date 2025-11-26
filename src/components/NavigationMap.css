@@ -1,64 +1,266 @@
 /* src/components/NavigationMap.css */
 
-/* .route-planner agora é um .card, mas mantemos o espaçamento e o layout flex */
-.route-planner {
-  margin-bottom: 1.5rem;
+.navigation-map-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  /* Increased padding to clear the new larger dock */
+  padding-bottom: 12vh; 
+}
+
+/* --- LEFT HUD PANEL (FLOATING GLASS EFFECT) --- */
+.navigation-map-left {
+  width: 28vw; /* Slightly wider for coordinates */
+  min-width: 350px;
+  max-width: 450px;
+  height: 100%;
+  flex-shrink: 0; /* Prevent shrinking */
+  
+  /* Floating Glass Effect */
+  background: linear-gradient(135deg, rgba(10, 25, 47, 0.85) 0%, rgba(5, 11, 20, 0.9) 100%);
+  border: 1px solid rgba(0, 163, 255, 0.3);
+  border-right: 4px solid var(--neon-blue);
+  border-radius: 0; /* Remove rounded corners for edge-to-edge */
+  
+  backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
+  padding: 3vh 1.5vw;
+  gap: 2vh;
+  z-index: 20; /* Above map */
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
 }
 
+/* --- ROUTE PLANNER CARD --- */
+/* Override standard card style for this specific context */
+.navigation-map-left .card {
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+.navigation-map-left .card-header {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.8rem;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1vh;
+  margin-bottom: 1vh;
+  text-shadow: 0 0 15px var(--neon-blue);
+}
+
+/* --- WAYPOINTS LIST --- */
 .waypoints-list {
-  max-height: 150px; /* Limita a altura da lista */
-  overflow-y: auto; /* Adiciona scroll se a lista for longa */
-  margin-bottom: 1rem;
-  padding-right: 5px; /* Espaço para a barra de scroll */
+  flex-grow: 1; /* Fill available space */
+  max-height: 25vh;
+  overflow-y: auto;
+  margin-bottom: 2vh;
+  padding-right: 5px;
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--neon-blue) transparent;
 }
 
-.empty-message {
-  color: var(--text-secondary);
-  font-style: italic;
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 1rem 0;
+.waypoints-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.waypoints-list::-webkit-scrollbar-thumb {
+  background: var(--neon-blue);
+  border-radius: 2px;
 }
 
 .waypoint-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem;
-  border-radius: 4px;
-  background-color: rgba(0, 0, 0, 0.1);
-  margin-bottom: 0.5rem;
+  padding: 1.2vh 1vw;
+  background: rgba(0, 163, 255, 0.05);
+  border: 1px solid rgba(0, 163, 255, 0.1);
+  margin-bottom: 0.8vh;
+  border-radius: 6px;
   font-size: 0.9rem;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
 }
 
-/* O botão de remover agora usa .btn-icon e .btn-danger, não precisa de mais regras aqui */
-/* As regras para .route-actions e seus filhos foram removidas */
+.waypoint-item:hover {
+  background: rgba(0, 163, 255, 0.15);
+  border-color: var(--neon-blue);
+  color: #fff;
+  transform: translateX(5px);
+}
+
+.coord-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  color: var(--neon-blue);
+}
+
+/* Empty State */
+.empty-message {
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  opacity: 0.6;
+  padding: 2rem;
+  margin-top: 4vh;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+}
+
+/* --- METRICS GRID (HUD STYLE) --- */
+.navigation-metrics {
+  margin-top: auto; /* Push to bottom of panel */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 2vh;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5vh;
+}
+
+.metric-item {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1vh;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.metric-value.possible { 
+  color: var(--neon-green); 
+  text-shadow: 0 0 10px rgba(46, 204, 113, 0.4); 
+}
+
+.metric-value.impossible { 
+  color: var(--neon-orange); 
+  text-shadow: 0 0 10px rgba(231, 76, 60, 0.4); 
+}
+
+/* --- ACTION BUTTONS --- */
 .route-actions {
   display: flex;
   gap: 10px;
+  margin-top: 1vh;
 }
 
-/* Estilos para o valor de "Rota Possível" */
-.metric-value.possible {
-  color: #2ecc71; /* Verde */
-}
-.metric-value.impossible {
-  color: #e74c3c; /* Vermelho */
-}
-
-/* Estilos para customizar o Leaflet Routing Machine */
-.leaflet-routing-container {
-  display: none; /* Esconde completamente o painel de direções padrão */
+.route-actions .btn {
+  font-family: 'Rajdhani', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 1.2vh 0;
 }
 
-/* Estilo para o ícone customizado do barco */
+/* --- MAP AREA (SIDE BY SIDE) --- */
+.navigation-map-leaflet {
+  flex-grow: 1;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* --- MAP STYLING: DARK SCI-FI MODE --- */
+/* This inverts standard map tiles to dark mode */
+.leaflet-tile-pane {
+  filter: grayscale(100%) invert(90%) hue-rotate(200deg) contrast(85%);
+}
+
+/* Leaflet Controls Styling */
+.leaflet-bar {
+  border: 1px solid var(--neon-blue) !important;
+  box-shadow: 0 0 10px rgba(0, 163, 255, 0.3) !important;
+}
+
+.leaflet-bar a {
+  background-color: rgba(10, 25, 47, 0.9) !important;
+  color: var(--neon-blue) !important;
+  border-bottom: 1px solid rgba(0, 163, 255, 0.3) !important;
+}
+
+.leaflet-bar a:hover {
+  background-color: var(--neon-blue) !important;
+  color: #000 !important;
+}
+
+/* Adjust Map Controls Position */
+.leaflet-top.leaflet-right {
+  top: 2vh;
+  right: 2vw;
+}
+
+/* --- BOAT MARKER STYLING --- */
 .boat-marker-icon {
-  background: none;
-  border: none;
-  color: var(--button-save-bg); /* Cor verde para destaque */
-  font-size: 24px;
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s linear; /* Transição suave na rotação */
+  filter: drop-shadow(0 0 10px var(--neon-green));
+  color: var(--neon-green);
+  transition: transform 0.2s linear;
+}
+
+/* --- TACTICAL WAYPOINT MARKERS --- */
+.waypoint-marker-icon {
+  background: rgba(10, 25, 47, 0.9);
+  border: 1px solid var(--neon-blue);
+  color: var(--neon-blue);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 0 10px rgba(0, 163, 255, 0.4);
+}
+
+/* --- MOBILE ADJUSTMENTS --- */
+@media (max-width: 900px) {
+  .navigation-map-container {
+    flex-direction: column;
+  }
+  
+  .navigation-map-left {
+    width: 100%;
+    height: 40vh; /* Panel on top/bottom */
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-top: 4px solid var(--neon-blue);
+    order: 2; /* Map on top (order 1), Panel below */
+  }
+  
+  .navigation-map-leaflet {
+    height: 60vh;
+    order: 1;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(3, 1fr); /* Spread metrics out */
+  }
 }
