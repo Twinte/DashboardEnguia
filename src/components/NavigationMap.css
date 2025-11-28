@@ -1,41 +1,50 @@
 /* src/components/NavigationMap.css */
 
 .navigation-map-container {
-  display: flex;
+  display: flex; /* Restore Flexbox side-by-side layout */
   width: 100%;
   height: 100%;
   position: relative;
   overflow: hidden;
-  /* Increased padding to clear the new larger dock */
-  padding-bottom: 12vh; 
+  padding-bottom: 0; /* Remove container padding for full height */
 }
 
-/* --- LEFT HUD PANEL (FLOATING GLASS EFFECT) --- */
+/* --- LEFT HUD PANEL --- */
 .navigation-map-left {
-  width: 28vw; /* Slightly wider for coordinates */
+  width: 28vw;
   min-width: 350px;
   max-width: 450px;
-  height: 100%;
-  flex-shrink: 0; /* Prevent shrinking */
+  height: 100%; /* Full height sidebar */
+  flex-shrink: 0;
   
-  /* Floating Glass Effect */
-  background: linear-gradient(135deg, rgba(10, 25, 47, 0.85) 0%, rgba(5, 11, 20, 0.9) 100%);
-  border: 1px solid rgba(0, 163, 255, 0.3);
-  border-right: 4px solid var(--neon-blue);
-  border-radius: 0; /* Remove rounded corners for edge-to-edge */
+  /* Glass Effect */
+  background: linear-gradient(135deg, rgba(10, 25, 47, 0.9) 0%, rgba(5, 11, 20, 0.95) 100%);
+  border-right: 4px solid var(--neon-blue); /* Strong division line */
+  border-radius: 0; /* Edge-to-edge look */
   
   backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
-  padding: 3vh 1.5vw;
+  
+  /* Padding: Top/Sides normal, Bottom increased to clear the Dock */
+  padding: 3vh 1.5vw 12vh 1.5vw; 
+  
   gap: 2vh;
-  z-index: 20; /* Above map */
+  z-index: 20; 
   box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
   overflow-y: auto;
 }
 
-/* --- ROUTE PLANNER CARD --- */
-/* Override standard card style for this specific context */
+/* --- MAP AREA --- */
+.navigation-map-leaflet {
+  flex-grow: 1; /* Map takes remaining space */
+  height: 100%;
+  position: relative; /* Not absolute, part of flex flow */
+  z-index: 1;
+}
+
+/* --- REST OF THE STYLES (Unchanged) --- */
+
 .navigation-map-left .card {
   background: transparent;
   border: none;
@@ -55,14 +64,13 @@
   text-shadow: 0 0 15px var(--neon-blue);
 }
 
-/* --- WAYPOINTS LIST --- */
+/* Waypoints List */
 .waypoints-list {
-  flex-grow: 1; /* Fill available space */
-  max-height: 25vh;
+  flex-grow: 1;
+  max-height: 40vh; /* Controlled height */
   overflow-y: auto;
   margin-bottom: 2vh;
   padding-right: 5px;
-  /* Custom scrollbar */
   scrollbar-width: thin;
   scrollbar-color: var(--neon-blue) transparent;
 }
@@ -70,7 +78,6 @@
 .waypoints-list::-webkit-scrollbar {
   width: 4px;
 }
-
 .waypoints-list::-webkit-scrollbar-thumb {
   background: var(--neon-blue);
   border-radius: 2px;
@@ -117,9 +124,9 @@
   border-radius: 8px;
 }
 
-/* --- METRICS GRID (HUD STYLE) --- */
+/* Metrics Grid */
 .navigation-metrics {
-  margin-top: auto; /* Push to bottom of panel */
+  margin-top: auto;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 2vh;
 }
@@ -154,17 +161,10 @@
   color: #fff;
 }
 
-.metric-value.possible { 
-  color: var(--neon-green); 
-  text-shadow: 0 0 10px rgba(46, 204, 113, 0.4); 
-}
+.metric-value.possible { color: var(--neon-green); text-shadow: 0 0 10px rgba(46, 204, 113, 0.4); }
+.metric-value.impossible { color: var(--neon-orange); text-shadow: 0 0 10px rgba(231, 76, 60, 0.4); }
 
-.metric-value.impossible { 
-  color: var(--neon-orange); 
-  text-shadow: 0 0 10px rgba(231, 76, 60, 0.4); 
-}
-
-/* --- ACTION BUTTONS --- */
+/* Buttons */
 .route-actions {
   display: flex;
   gap: 10px;
@@ -180,51 +180,36 @@
   padding: 1.2vh 0;
 }
 
-/* --- MAP AREA (SIDE BY SIDE) --- */
-.navigation-map-leaflet {
-  flex-grow: 1;
-  height: 100%;
-  position: relative;
-  z-index: 1;
-}
-
-/* --- MAP STYLING: DARK SCI-FI MODE --- */
-/* This inverts standard map tiles to dark mode */
+/* Map Style */
 .leaflet-tile-pane {
   filter: grayscale(100%) invert(90%) hue-rotate(200deg) contrast(85%);
 }
 
-/* Leaflet Controls Styling */
 .leaflet-bar {
   border: 1px solid var(--neon-blue) !important;
   box-shadow: 0 0 10px rgba(0, 163, 255, 0.3) !important;
 }
-
 .leaflet-bar a {
   background-color: rgba(10, 25, 47, 0.9) !important;
   color: var(--neon-blue) !important;
   border-bottom: 1px solid rgba(0, 163, 255, 0.3) !important;
 }
-
 .leaflet-bar a:hover {
   background-color: var(--neon-blue) !important;
   color: #000 !important;
 }
 
-/* Adjust Map Controls Position */
 .leaflet-top.leaflet-right {
   top: 2vh;
   right: 2vw;
 }
 
-/* --- BOAT MARKER STYLING --- */
 .boat-marker-icon {
   filter: drop-shadow(0 0 10px var(--neon-green));
   color: var(--neon-green);
   transition: transform 0.2s linear;
 }
 
-/* --- TACTICAL WAYPOINT MARKERS --- */
 .waypoint-marker-icon {
   background: rgba(10, 25, 47, 0.9);
   border: 1px solid var(--neon-blue);
@@ -239,7 +224,7 @@
   box-shadow: 0 0 10px rgba(0, 163, 255, 0.4);
 }
 
-/* --- MOBILE ADJUSTMENTS --- */
+/* Mobile Adjustments */
 @media (max-width: 900px) {
   .navigation-map-container {
     flex-direction: column;
@@ -247,12 +232,14 @@
   
   .navigation-map-left {
     width: 100%;
-    height: 40vh; /* Panel on top/bottom */
+    height: 40vh; 
+    max-width: none;
     margin: 0;
     border-radius: 0;
-    border-left: none;
+    border-right: none;
     border-top: 4px solid var(--neon-blue);
-    order: 2; /* Map on top (order 1), Panel below */
+    padding-bottom: 2vh; /* Reset padding for mobile as layout shifts */
+    order: 2;
   }
   
   .navigation-map-leaflet {
@@ -261,6 +248,6 @@
   }
   
   .metrics-grid {
-    grid-template-columns: repeat(3, 1fr); /* Spread metrics out */
+    grid-template-columns: repeat(3, 1fr);
   }
 }
