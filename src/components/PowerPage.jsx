@@ -1,10 +1,9 @@
 // src/components/PowerPage.jsx
-import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  FaBolt, 
-  FaTemperatureHigh, 
-  FaRegClock, 
+import {
+  FaBolt,
+  FaTemperatureHigh,
+  FaRegClock,
   FaChargingStation,
   FaHeartbeat,
   FaLayerGroup
@@ -18,18 +17,14 @@ import './PowerPage.css';
 const PowerPage = () => {
   const { t } = useTranslation();
   const { sensorData } = useSensorData();
-  const { energyMode } = useSettings(); // Get current mode from settings
+  const { energyMode } = useSettings();
 
   const percentage = sensorData?.batteryPercentage || 0;
   const voltage = sensorData?.batteryVoltage || 0;
   const temperature = sensorData?.temp || 0;
   const currentDraw = sensorData?.currentDraw || 0;
-  
-  // Calculated or Static remaining time
-  const timeRemaining = 5.2; 
-  
-  // Simulated State of Health (In a real app, this comes from the BMS)
-  const stateOfHealth = "Good"; 
+  const timeRemaining = sensorData?.batteryTimeRemaining || 0;
+  const batteryHealth = sensorData?.batteryHealth || "Good";
 
   // Determine colors based on status
   const getStatusColor = (val, type) => {
@@ -42,10 +37,10 @@ const PowerPage = () => {
 
   return (
     <div className="power-container">
-      
+
       {/* --- LEFT PANEL: ELECTRICAL & HEALTH --- */}
       <div className="power-side-panel left">
-        
+
         {/* 1. Voltage */}
         <div className="hud-card">
           <FaBolt className="hud-card-icon" />
@@ -70,13 +65,12 @@ const PowerPage = () => {
           </div>
         </div>
 
-        {/* 3. NEW: State of Health */}
         <div className="hud-card">
           <FaHeartbeat className="hud-card-icon" style={{ color: '#2ECC71' }} />
           <div className="hud-card-info">
-            <span className="hud-label">State of Health</span>
+            <span className="hud-label">{t('state_of_health')}</span>
             <div className="hud-value">
-              {stateOfHealth}
+              {t(batteryHealth.toLowerCase().replace(' ', '_')) || batteryHealth}
             </div>
           </div>
         </div>
@@ -85,10 +79,10 @@ const PowerPage = () => {
 
       {/* --- CENTER: POWER CORE --- */}
       <div className="power-core-section">
-        <div className="power-ring-container">
+        <div className="power-ring-container" style={{ '--battery-progress': percentage }}>
           <div className="reactor-ring" style={{ borderTopColor: batteryColor, boxShadow: `0 0 30px ${batteryColor}40` }}></div>
           <div className="reactor-ring-inner"></div>
-          
+
           <div className="core-value">
             <FaChargingStation className="core-icon" style={{ color: batteryColor }}/>
             <span className="core-percentage" style={{ color: batteryColor, textShadow: `0 0 30px ${batteryColor}60` }}>
@@ -101,7 +95,7 @@ const PowerPage = () => {
 
       {/* --- RIGHT PANEL: OPERATIONS & MODE --- */}
       <div className="power-side-panel right">
-        
+
         {/* 1. Temperature */}
         <div className={`hud-card ${temperature > 50 ? 'danger' : ''}`}>
           <FaTemperatureHigh className="hud-card-icon" style={{ color: getStatusColor(temperature, 'temp') }}/>
@@ -126,11 +120,10 @@ const PowerPage = () => {
           </div>
         </div>
 
-        {/* 3. NEW: Boat Mode */}
         <div className="hud-card">
           <FaLayerGroup className="hud-card-icon" style={{ color: 'var(--neon-orange)' }} />
           <div className="hud-card-info">
-            <span className="hud-label">Boat Mode</span>
+            <span className="hud-label">{t('boat_mode')}</span>
             <div className="hud-value" style={{ fontSize: '1.5rem', textTransform: 'uppercase' }}>
               {t(energyMode) || energyMode}
             </div>

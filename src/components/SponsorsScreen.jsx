@@ -1,7 +1,8 @@
 // src/components/SponsorsScreen.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 
-// Logos dos apoiadores
 import logoAneel from '../assets/logos/aneel.png';
 import logoUfpa from '../assets/logos/ufpa.png';
 import logoFadesp from '../assets/logos/fadesp.png';
@@ -10,20 +11,8 @@ import logoGhport from '../assets/logos/ghport.png';
 import logoGtnav from '../assets/logos/gtnav.png';
 import logoCemazon from '../assets/logos/ceamazon.png';
 
-// Logo principal do seu projeto
 import logoNorteEnergia from '../assets/logos/norteenergia.svg';
 
-// --- Lista de verificação do sistema ---
-const systemChecks = [
-  "Inicializando kernel do sistema...",
-  "Conectando ao servidor de telemetria...",
-  "Verificando status dos sensores...",
-  "Calibrando bússola e GPS...",
-  "Carregando interface do dashboard...",
-  "Pronto."
-];
-
-// Array com os logótipos dos apoiadores
 const sponsorLogos = [
   { name: 'ANEEL', logo: logoAneel },
   { name: 'UFPA', logo: logoUfpa },
@@ -35,9 +24,20 @@ const sponsorLogos = [
 ];
 
 const SponsorsScreen = ({ onFinished }) => {
+  const { t } = useTranslation();
   const [checks, setChecks] = useState([]);
   const [progress, setProgress] = useState(0);
-  const totalDuration = 6000; // Duração total em ms (6 segundos)
+
+  const systemChecks = useMemo(() => [
+    t('initializing_kernel'),
+    t('connecting_telemetry'),
+    t('checking_sensors'),
+    t('calibrating_compass'),
+    t('loading_interface'),
+    t('ready'),
+  ], [t]);
+
+  const totalDuration = 6000;
   const checkInterval = totalDuration / (systemChecks.length + 1);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const SponsorsScreen = ({ onFinished }) => {
       clearInterval(progressTimer);
       clearTimeout(finishTimer);
     };
-  }, [onFinished, checkInterval]);
+  }, [onFinished, checkInterval, systemChecks]);
 
   // Estilos dinâmicos para animações
   const styleSheet = `
@@ -74,7 +74,7 @@ const SponsorsScreen = ({ onFinished }) => {
     .sponsor-logo { transition: transform 0.3s ease, filter 0.3s ease; }
     .sponsor-logo:hover { transform: scale(1.1); filter: grayscale(0%) brightness(1); }
   `;
-  
+
   // Objeto de estilos usando variáveis CSS do seu tema
   const styles = {
     container: { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'var(--background-primary)', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: "'Roboto Mono', 'Consolas', monospace", overflow: 'hidden', zIndex: 9999, },
@@ -104,8 +104,8 @@ const SponsorsScreen = ({ onFinished }) => {
           <div style={styles.bootSequence}>
             {checks.map((check, index) => (
               <p key={index} className="system-check-item" style={{ animationDelay: `${index * 0.1}s` }}>
-                <span style={{ color: check === "Pronto." ? 'var(--button-save-bg)' : 'var(--text-secondary)' }}>
-                  {check === "Pronto." ? '✓ ' : '» '}
+                <span style={{ color: check === t('ready') ? 'var(--button-save-bg)' : 'var(--text-secondary)' }}>
+                  {check === t('ready') ? '✓ ' : '» '}
                 </span>
                 {check}
               </p>
@@ -116,7 +116,7 @@ const SponsorsScreen = ({ onFinished }) => {
           </div>
         </div>
         <footer style={styles.footer}>
-          <p style={styles.footerText}>Com o Apoio De:</p>
+          <p style={styles.footerText}>{t('supported_by')}</p>
           <div style={styles.sponsorsLogos}>
             {sponsorLogos.map((sponsor) => (
               <img key={sponsor.name} className="sponsor-logo" src={sponsor.logo} alt={sponsor.name} style={styles.sponsorImage} />
@@ -126,6 +126,10 @@ const SponsorsScreen = ({ onFinished }) => {
       </div>
     </>
   );
+};
+
+SponsorsScreen.propTypes = {
+  onFinished: PropTypes.func.isRequired,
 };
 
 export default SponsorsScreen;

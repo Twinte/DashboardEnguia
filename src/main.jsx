@@ -1,5 +1,5 @@
 // src/main.jsx
-import React, { StrictMode } from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -21,8 +21,8 @@ import { MQTTProvider } from './context/MQTTContext';
 import { ToastProvider } from './context/ToastContext';
 import { AlertProvider } from './context/AlertContext';
 import AppInitializer from './components/AppInitializer';
+import ErrorBoundary from './components/ErrorBoundary';
 
-// Correção para os ícones do Leaflet em produção
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
@@ -35,21 +35,22 @@ const root = createRoot(rootElement);
 
 root.render(
   <StrictMode>
-    <BrowserRouter>
-      <SettingsProvider>
-        <SensorDataProvider>
-          {/* A ORDEM FOI CORRIGIDA AQUI */}
-          <ToastProvider>
-            <MQTTProvider>
-              <TripProvider>
-                <AlertProvider>
-                  <AppInitializer />
-                </AlertProvider>
-              </TripProvider>
-            </MQTTProvider>
-          </ToastProvider>
-        </SensorDataProvider>
-      </SettingsProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <SettingsProvider>
+          <SensorDataProvider>
+            <ToastProvider>
+              <MQTTProvider>
+                <TripProvider>
+                  <AlertProvider>
+                    <AppInitializer />
+                  </AlertProvider>
+                </TripProvider>
+              </MQTTProvider>
+            </ToastProvider>
+          </SensorDataProvider>
+        </SettingsProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   </StrictMode>,
 );

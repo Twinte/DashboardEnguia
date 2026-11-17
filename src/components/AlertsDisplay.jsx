@@ -1,5 +1,4 @@
 // src/components/AlertsDisplay.jsx
-import React from 'react';
 import { useAlerts } from '../context/AlertContext';
 import { FaExclamationTriangle, FaTimes } from 'react-icons/fa';
 import './AlertsDisplay.css';

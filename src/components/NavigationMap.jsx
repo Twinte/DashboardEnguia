@@ -1,10 +1,12 @@
 // src/components/NavigationMap.jsx
-import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvent, Polyline, LayersControl, Tooltip } from "react-leaflet";
-import L from 'leaflet'; // Needed for custom divIcon
+import { useEffect, useState, useMemo, memo, useCallback } from "react";
+import { MapContainer, TileLayer, Marker, useMapEvent, Polyline, LayersControl } from "react-leaflet";
+import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
 
 import { FaTrash, FaCrosshairs } from "react-icons/fa";
+import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import RecenterMap from "./RecenterMap";
 import BoatMarker from "./BoatMarker";
 import { useSensorData } from "../context/SensorDataContext";
@@ -12,10 +14,9 @@ import { useTrip } from "../context/TripContext";
 import RoutingMachine from "./RoutingMachine";
 import "./NavigationMap.css";
 
-// Helper to format lat/lng
 const formatCoord = (val) => val ? val.toFixed(4) : '';
 
-function MapClickHandler({ onClick, isTripActive }) {
+const MapClickHandler = memo(function MapClickHandler({ onClick, isTripActive }) {
   const map = useMapEvent("click", (e) => {
     if (!isTripActive) {
       onClick(e);
@@ -26,9 +27,15 @@ function MapClickHandler({ onClick, isTripActive }) {
     mapContainer.style.cursor = isTripActive ? "not-allowed" : "crosshair";
   }, [map, isTripActive]);
   return null;
-}
+});
+
+MapClickHandler.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  isTripActive: PropTypes.bool.isRequired,
+};
 
 const NavigationMap = () => {
+  const { t } = useTranslation();
   const { sensorData } = useSensorData();
   const { heading, lat, lng, batteryPercentage, speedKPH } = sensorData;
 
@@ -43,23 +50,22 @@ const NavigationMap = () => {
     startTrip,
     endTrip,
     mqttConnectionStatus,
-    distanceToNextWaypoint,
     courseToSteer
   } = useTrip();
 
   const [mapZoom] = useState(13);
-  const [totalDistance, setTotalDistance] = useState(0); 
-  const [eta, setEta] = useState(0); 
+  const [totalDistance, setTotalDistance] = useState(0);
+  const [eta, setEta] = useState(0);
 
-  const handleSetRouteSummary = (summary) => {
+  const handleSetRouteSummary = useCallback((summary) => {
     if (summary) {
-      setTotalDistance(summary.totalDistance); 
-      setEta(summary.totalTime); 
+      setTotalDistance(summary.totalDistance);
+      setEta(summary.totalTime);
     } else {
       setTotalDistance(0);
       setEta(0);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (!isTripActive || totalDistance === 0) return;
@@ -69,41 +75,40 @@ const NavigationMap = () => {
     setEta(timeInHours);
   }, [isTripActive, totalDistance, distanceTraveled, speedKPH]);
 
-  const handleMapClick = async (e) => {
+  const handleMapClick = useCallback(async (e) => {
     const newWaypoint = { lat: e.latlng.lat, lng: e.latlng.lng, id: Date.now() };
     await addWaypoint(newWaypoint);
-  };
+  }, [addWaypoint]);
 
-  const batteryConsumption = totalDistance * 0.5; 
-  const isRoutePossible = batteryPercentage - batteryConsumption >= 0;
+  const isRoutePossible = useMemo(() => {
+    const batteryConsumption = totalDistance * 0.5;
+    return batteryPercentage - batteryConsumption >= 0;
+  }, [totalDistance, batteryPercentage]);
 
-  // Prepare points for the planned route line
-  // Start from boat position -> WP1 -> WP2...
-  const plannedRouteLine = [
+  const plannedRouteLine = useMemo(() => [
     [lat, lng],
     ...waypoints.map(wp => [wp.lat, wp.lng])
-  ];
+  ], [lat, lng, waypoints]);
 
   return (
     <div className="navigation-map-container">
-      
-      {/* LEFT HUD PANEL (Floating) */}
+
       <div className="navigation-map-left">
         <div className="card-header">
-          {isTripActive ? "MISSION ACTIVE" : "ROUTE PLANNER"}
+          {isTripActive ? t('mission_active') : t('route_planner')}
         </div>
 
         <div className="waypoints-list">
           {waypoints.length === 0 && (
             <div className="empty-message">
               <FaCrosshairs size={30} style={{marginBottom:'1rem'}}/>
-              <br/>TAP MAP TO SET COORDINATES
+              <br/>{t('tap_map_to_set')}
             </div>
           )}
           {waypoints.map((wp, index) => (
             <div key={wp.id} className="waypoint-item">
               <div style={{display:'flex', flexDirection:'column'}}>
-                <span style={{fontSize:'0.7rem', opacity:0.7}}>WAYPOINT {index + 1}</span>
+                <span style={{fontSize:'0.7rem', opacity:0.7}}>{t('waypoint')} {index + 1}</span>
                 <span className="coord-text">
                   {formatCoord(wp.lat)}, {formatCoord(wp.lng)}
                 </span>
@@ -120,7 +125,7 @@ const NavigationMap = () => {
         <div className="route-actions">
           {isTripActive ? (
             <button onClick={endTrip} className="btn btn-danger" style={{width: '100%'}}>
-              ABORT MISSION
+              {t('abort_mission')}
             </button>
           ) : (
             <>
@@ -129,7 +134,7 @@ const NavigationMap = () => {
                 className="btn btn-primary"
                 disabled={waypoints.length === 0 || mqttConnectionStatus === "connecting"}
               >
-                {mqttConnectionStatus === "connecting" ? "SYNC..." : "ENGAGE"}
+                {mqttConnectionStatus === "connecting" ? t('sync') : t('engage')}
               </button>
               <button
                 onClick={() => {
@@ -140,33 +145,32 @@ const NavigationMap = () => {
                 className="btn btn-danger"
                 disabled={waypoints.length === 0}
               >
-                CLEAR
+                {t('clear')}
               </button>
             </>
           )}
         </div>
 
-        {/* METRICS */}
         <div className="navigation-metrics">
           <div className="metrics-grid">
             <div className="metric-item">
-              <span className="metric-label">TOTAL DIST</span>
-              <span className="metric-value">{totalDistance.toFixed(2)} <small>KM</small></span>
+              <span className="metric-label">{t('total_dist')}</span>
+              <span className="metric-value">{totalDistance.toFixed(2)} <small>{t('km')}</small></span>
             </div>
             <div className="metric-item">
-              <span className="metric-label">EST. TIME</span>
+              <span className="metric-label">{t('est_time')}</span>
               <span className="metric-value">
-                {eta > 0 ? (eta * 60).toFixed(0) : "--"} <small>MIN</small>
+                {eta > 0 ? (eta * 60).toFixed(0) : "--"} <small>{t('min')}</small>
               </span>
             </div>
             <div className="metric-item">
-              <span className="metric-label">FEASIBLE</span>
+              <span className="metric-label">{t('feasible')}</span>
               <span className={`metric-value ${isRoutePossible ? "possible" : "impossible"}`}>
-                {isRoutePossible ? "YES" : "NO"}
+                {isRoutePossible ? t('yes') : t('no')}
               </span>
             </div>
             <div className="metric-item">
-              <span className="metric-label">HEADING</span>
+              <span className="metric-label">{t('heading')}</span>
               <span className="metric-value">
                 {isTripActive ? courseToSteer.toFixed(0) : heading}°
               </span>
@@ -206,12 +210,12 @@ const NavigationMap = () => {
 
           {/* 2. PLANNED ROUTE LINES (Blue Dashed) - Always show if waypoints exist */}
           {waypoints.length > 0 && (
-             <Polyline 
-               positions={plannedRouteLine} 
-               color="#00A3FF" 
-               weight={3} 
-               dashArray="10, 10" 
-               opacity={0.6} 
+             <Polyline
+               positions={plannedRouteLine}
+               color="#00A3FF"
+               weight={3}
+               dashArray="10, 10"
+               opacity={0.6}
              />
           )}
 
@@ -220,16 +224,14 @@ const NavigationMap = () => {
             <RoutingMachine start={[lat, lng]} waypoints={waypoints} setRouteSummary={handleSetRouteSummary} />
           )}
 
-          {/* 4. WAYPOINT MARKERS (Custom Div Icons for text) */}
-          {!isTripActive && waypoints.map((wp, index) => {
-             // Create a custom icon displaying the coordinate numbers
+          {!isTripActive && waypoints.map((wp) => {
              const textIcon = L.divIcon({
                className: 'custom-wp-icon',
                html: `<div class="waypoint-marker-icon">
                         ${formatCoord(wp.lat)}, ${formatCoord(wp.lng)}
                       </div>`,
                iconSize: [100, 20],
-               iconAnchor: [50, 30] // Offset so it appears above point
+               iconAnchor: [50, 30]
              });
 
              return (

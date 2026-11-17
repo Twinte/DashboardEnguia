@@ -1,6 +1,6 @@
 # --- Estágio 1: Build da Aplicação React ---
 # Usa uma imagem oficial do Node.js como base. 'alpine' é uma versão leve.
-FROM node:18-alpine AS build
+FROM node:22-alpine AS build
 
 # Define o diretório de trabalho dentro do container
 WORKDIR /app
@@ -8,15 +8,18 @@ WORKDIR /app
 # Copia os arquivos de definição de pacotes e instala as dependências.
 # Fazer isso em um passo separado aproveita o cache do Docker.
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 # Copia todo o resto do código-fonte da aplicação
 COPY . .
 # Declara um argumento de build que podemos passar no comando docker build
 ARG VITE_API_URL
+ARG VITE_MQTT_HOST=broker.hivemq.com
+ARG VITE_MQTT_PORT=8884
+ARG VITE_MQTT_USE_SSL=true
 
 # Executa o comando de build, passando o argumento como uma variável de ambiente
-RUN VITE_API_URL=$VITE_API_URL npm run build
+RUN VITE_API_URL=$VITE_API_URL VITE_MQTT_HOST=$VITE_MQTT_HOST VITE_MQTT_PORT=$VITE_MQTT_PORT VITE_MQTT_USE_SSL=$VITE_MQTT_USE_SSL npm run build
 
 # --- Estágio 2: Servidor de Produção ---
 # Usa uma imagem oficial e leve do Nginx para servir os arquivos

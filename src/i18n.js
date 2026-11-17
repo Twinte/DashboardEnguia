@@ -14,7 +14,7 @@ i18n
   .use(initReactI18next)
   // Inicializa o i18next
   .init({
-    debug: true, // Ative para ver logs no console durante o desenvolvimento
+    debug: import.meta.env.DEV && import.meta.env.MODE !== 'test', // Ative para ver logs no console durante o desenvolvimento
     fallbackLng: 'en', // Idioma padrão se o detetado não estiver disponível
     lng: savedLanguage, // Define o idioma inicial (se guardado)
     interpolation: {

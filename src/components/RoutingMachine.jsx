@@ -1,11 +1,11 @@
 // src/components/RoutingMachine.jsx
 import { useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
-// Para corrigir um problema comum de ícones em falta com o webpack
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -22,7 +22,7 @@ const RoutingMachine = ({ start, waypoints, setRouteSummary }) => {
 
     // Combina o ponto de início (barco) com os waypoints da rota
     const allWaypoints = [
-      L.latLng(start[0], start[1]), 
+      L.latLng(start[0], start[1]),
       ...waypoints.map(wp => L.latLng(wp.lat, wp.lng))
     ];
 
@@ -51,7 +51,7 @@ const RoutingMachine = ({ start, waypoints, setRouteSummary }) => {
       draggableWaypoints: false,
       fitSelectedRoutes: true,
       show: false,
-      
+
       // Personaliza a linha da rota
       lineOptions: {
         styles: [{ color: '#3388ff', opacity: 0.7, weight: 5, dashArray: "10, 5" }]
@@ -65,7 +65,7 @@ const RoutingMachine = ({ start, waypoints, setRouteSummary }) => {
     routingControl.on('routesfound', function(e) {
       const routes = e.routes;
       const summary = routes[0].summary;
-      
+
       // Envia as métricas reais para o componente pai (NavigationMap)
       if (setRouteSummary) {
         setRouteSummary({
@@ -91,6 +91,18 @@ const RoutingMachine = ({ start, waypoints, setRouteSummary }) => {
   }, [map, start, waypoints, setRouteSummary]); // Use primitives instead of the array
 
   return null;
+};
+
+RoutingMachine.propTypes = {
+  start: PropTypes.arrayOf(PropTypes.number).isRequired,
+  waypoints: PropTypes.arrayOf(
+    PropTypes.shape({
+      lat: PropTypes.number.isRequired,
+      lng: PropTypes.number.isRequired,
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    })
+  ).isRequired,
+  setRouteSummary: PropTypes.func,
 };
 
 export default RoutingMachine;

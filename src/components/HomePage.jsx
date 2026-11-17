@@ -1,134 +1,112 @@
-// src/components/HomePage.jsx
-import React, { useState, useEffect } from 'react';
-import GaugeChart from 'react-gauge-chart';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FaBatteryHalf, FaCaretDown, FaCaretUp, FaCompass, FaRoute, FaTemperatureHalf, FaWind } from 'react-icons/fa6';
+import { GiBoatPropeller } from 'react-icons/gi';
 import { useSensorData } from '../context/SensorDataContext';
-import './HomePage.css'; // <--- IMPORT THE NEW CSS FILE HERE
+import { useTrip } from '../context/TripContext';
+import { useToast } from '../context/ToastContext';
+import MetricCard from './MetricCard';
+import PrimaryGauge from './PrimaryGauge';
+import './HomePage.css';
 
 const HomePage = () => {
   const { t } = useTranslation();
   const { sensorData, isLoading } = useSensorData();
-  
-  const [prevSpeedPercent, setPrevSpeedPercent] = useState(0);
-  const [prevRpmPercent, setPrevRpmPercent] = useState(0);
+  const { addToast } = useToast();
+  const { isTripActive, distanceTraveled, courseToSteer, waypoints } = useTrip();
+  const [trimPosition, setTrimPosition] = useState(Number(sensorData.trimBow) || 0);
+  const [isAdjustingTrim, setIsAdjustingTrim] = useState(false);
 
-  useEffect(() => {
-    if (!isLoading && sensorData) {
-      // Calculate percentages for the gauge visual (0.0 to 1.0)
-      // Assuming max speed 100 KPH and max RPM 4000
-      setPrevSpeedPercent(Math.min(sensorData.speedKPH / 100, 1));
-      setPrevRpmPercent(Math.min(sensorData.rpm / 4000, 1));
+  useEffect(() => setTrimPosition(Number(sensorData.trimBow) || 0), [sensorData.trimBow]);
+
+  const values = useMemo(() => ({
+    speed: Number.parseFloat(sensorData.speedKPH) || 0,
+    rpm: Number.parseInt(sensorData.rpm, 10) || 0,
+    battery: Number(sensorData.batteryPercentage) || 0,
+    temperature: Number(sensorData.temp) || 0,
+    wind: Number(sensorData.windSpeed) || 0,
+    heading: Number(isTripActive ? courseToSteer : sensorData.heading) || 0,
+    range: Number(sensorData.batteryTimeRemaining) || 0,
+  }), [sensorData, isTripActive, courseToSteer]);
+
+  const handleTrimAdjust = useCallback(async (direction) => {
+    setIsAdjustingTrim(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || '/api/latest_data';
+      const baseUrl = apiUrl.replace('/api/latest_data', '');
+      const response = await fetch(`${baseUrl}/api/trim`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ direction }),
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      if (!data.success || !Number.isFinite(data.trim_bow)) throw new Error('Invalid trim response');
+      setTrimPosition(data.trim_bow);
+    } catch (error) {
+      console.error('Failed to adjust trim:', error);
+      addToast(t('trim_adjust_failed'), 'error');
+    } finally {
+      setIsAdjustingTrim(false);
     }
-  }, [sensorData.speedKPH, sensorData.rpm, isLoading]);
+  }, [addToast, t]);
 
-  // Simple loading state
   if (isLoading) {
-    return <div className="loading-screen">SYSTEM INITIALIZING...</div>;
+    return <div className="loading-screen" role="status"><div className="loading-spinner" />{t('loading', 'System initializing')}</div>;
   }
 
+  const batteryTone = values.battery < 20 ? 'danger' : values.battery < 40 ? 'warning' : 'success';
+  const temperatureTone = values.temperature > 50 ? 'danger' : 'default';
+
   return (
-    <div className="home-grid">
-      
-      {/* --- LEFT COLUMN: SPEED GAUGE --- */}
-      <div className="gauge-section left">
-        <div className="gauge-ring">
-           <GaugeChart 
-              id="speed-gauge" 
-              nrOfLevels={20} 
-              // Green -> Yellow -> Red colors
-              colors={["#2ECC71", "#F1C40F", "#E74C3C"]} 
-              arcWidth={0.3} 
-              percent={prevSpeedPercent} 
-              needleColor="var(--gauge-needle)"
-              needleBaseColor="var(--gauge-needle)"
-              textColor="transparent" // Hide default text
-              hideText={true} 
-              animate={true}
-           />
-           {/* Custom Text Overlay */}
-           <div className="gauge-inner-text">
-             <span className="value-large">{parseFloat(sensorData.speedKPH).toFixed(0)}</span>
-             <span className="unit-label">KPH</span>
-           </div>
+    <section className="home-dashboard" aria-label={t('home_tab')}>
+      <header className="home-dashboard__intro">
+        <div>
+          <span className="eyebrow">ENGUIA</span>
+          <h1>{isTripActive ? t('mission_active') : t('home_tab')}</h1>
         </div>
-        
-        {/* Fake Fuel Bar (Visual Only based on Battery for now) */}
-        <div className="gauge-footer-bar">
-           <div className="bar-track">
-              <div 
-                className="bar-fill" 
-                style={{ width: `${sensorData.batteryPercentage}%`, backgroundColor: sensorData.batteryPercentage < 20 ? '#E74C3C' : '#2ECC71' }}
-              ></div>
-           </div>
-           <div className="bar-labels">
-              <span>E</span>
-              <span>FUEL (BAT)</span>
-              <span>F</span>
-           </div>
-        </div>
+        <span className={`connection-badge ${sensorData.wifiConnected ? 'is-online' : 'is-offline'}`}>
+          <span aria-hidden="true" />{sensorData.wifiConnected ? t('wifi_connected') : t('wifi_disconnected')}
+        </span>
+      </header>
+
+      <div className="home-dashboard__grid">
+        <PrimaryGauge label={t('speed', 'Speed')} value={values.speed} max={130} unit="KPH" helper={t('current_speed', 'Current speed')} />
+
+        <section className="navigation-summary surface-card" aria-labelledby="navigation-summary-title">
+          <div className="navigation-summary__heading">
+            <div><span className="eyebrow">{isTripActive ? t('mission_active') : t('route_planner')}</span><h2 id="navigation-summary-title">{Math.round(values.heading)}°</h2></div>
+            <FaCompass aria-hidden="true" />
+          </div>
+          <div className="compass-track" aria-label={`${t('heading')}: ${Math.round(values.heading)} degrees`}>
+            <span>N</span><span>NE</span><span>E</span><span>SE</span><span>S</span>
+            <i style={{ left: `${(values.heading / 360) * 100}%` }} />
+          </div>
+          <div className="navigation-summary__stats">
+            <div><span>{t('total_dist')}</span><strong>{distanceTraveled.toFixed(1)} km</strong></div>
+            <div><span>{t('waypoint')}</span><strong>{waypoints.length}</strong></div>
+            <div><span>{t('battery_percentage')}</span><strong>{values.battery}%</strong></div>
+          </div>
+        </section>
+
+        <PrimaryGauge label={t('battery_percentage')} value={values.battery} max={100} unit="%" tone={batteryTone} helper={`${values.range.toFixed(1)} h ${t('estimated_time_remaining').toLowerCase()}`} />
+
+        <MetricCard icon={<GiBoatPropeller />} label="RPM" value={values.rpm} unit="RPM" />
+        <MetricCard icon={<FaWind />} label={t('wind_speed')} value={values.wind} unit="KTS" />
+        <MetricCard icon={<FaTemperatureHalf />} label={t('temperature')} value={values.temperature} unit="°C" tone={temperatureTone} />
+        <MetricCard icon={<FaBatteryHalf />} label={t('estimated_time_remaining')} value={values.range.toFixed(1)} unit="H" tone={batteryTone} />
+
+        <section className="trim-control surface-card" aria-labelledby="trim-title">
+          <div className="trim-control__heading"><div><span className="eyebrow">CONTROL</span><h2 id="trim-title">BOW TRIM</h2></div><strong>{trimPosition > 0 ? `+${trimPosition}` : trimPosition}</strong></div>
+          <div className="trim-control__track" aria-hidden="true"><span style={{ left: `${((trimPosition + 5) / 10) * 100}%` }} /></div>
+          <div className="trim-control__scale" aria-hidden="true"><span>-5</span><span>0</span><span>+5</span></div>
+          <div className="trim-control__actions">
+            <button onClick={() => handleTrimAdjust('up')} disabled={isAdjustingTrim || trimPosition <= -5} aria-label="Trim bow up"><FaCaretUp /> Up</button>
+            <button onClick={() => handleTrimAdjust('down')} disabled={isAdjustingTrim || trimPosition >= 5} aria-label="Trim bow down"><FaCaretDown /> Down</button>
+          </div>
+        </section>
+
+        <MetricCard className="route-card" icon={<FaRoute />} label={t('route_planner')} value={isTripActive ? t('mission_active') : `${waypoints.length} ${t('waypoint')}`} helper={`${Math.round(values.heading)}° ${t('heading')}`} tone="accent" />
       </div>
-
-      {/* --- CENTER COLUMN: LOGO & INFO --- */}
-      <div className="center-section">
-         <div className="logo-area">
-            <span className="logo-text">ENGUIA</span>
-         </div>
-         
-         {/* Central Bubble: Showing Wind or Oil Pressure */}
-         <div className="central-info-bubble">
-            <span className="bubble-label">{t('wind_speed')}</span>
-            <span className="bubble-value">{sensorData.windSpeed}</span>
-            <span className="bubble-unit">KTS</span>
-         </div>
-
-         {/* Trim Indicators (Static/Visual for layout) */}
-         <div className="trim-controls">
-            <span className="trim-label">TRIM</span>
-            <div className="trim-indicators">
-               <div className="trim-bar"><div className="trim-fill" style={{height: '60%'}}></div></div>
-               <div className="trim-bar"><div className="trim-fill" style={{height: '60%'}}></div></div>
-            </div>
-         </div>
-      </div>
-
-      {/* --- RIGHT COLUMN: RPM GAUGE --- */}
-      <div className="gauge-section right">
-        <div className="gauge-ring">
-           <GaugeChart 
-              id="rpm-gauge" 
-              nrOfLevels={20} 
-              colors={["#00A3FF", "#2ECC71", "#E74C3C"]} 
-              arcWidth={0.3} 
-              percent={prevRpmPercent} 
-              needleColor="var(--gauge-needle)"
-              needleBaseColor="var(--gauge-needle)"
-              hideText={true}
-              animate={true}
-           />
-           <div className="gauge-inner-text">
-             <span className="value-large">{sensorData.rpm}</span>
-             <span className="unit-label">RPM</span>
-           </div>
-        </div>
-
-        {/* Temp Bar */}
-        <div className="gauge-footer-bar">
-           <div className="bar-track">
-              {/* Simulating Temp bar fill roughly based on 0-100C */}
-              <div 
-                className="bar-fill" 
-                style={{ width: `${Math.min(sensorData.temp, 100)}%`, backgroundColor: sensorData.temp > 80 ? '#E74C3C' : '#00A3FF' }}
-              ></div>
-           </div>
-           <div className="bar-labels">
-              <span>C</span>
-              <span>TEMP {sensorData.temp}°</span>
-              <span>H</span>
-           </div>
-        </div>
-      </div>
-
-    </div>
+    </section>
   );
 };
 

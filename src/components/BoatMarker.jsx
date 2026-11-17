@@ -1,12 +1,12 @@
 // src/components/BoatMarker.jsx
-import React from 'react';
+import { memo } from 'react';
+import PropTypes from 'prop-types';
 import { Marker } from 'react-leaflet';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { FaLocationArrow } from 'react-icons/fa';
 import L from 'leaflet';
 
-const BoatMarker = ({ position, heading }) => {
-  // Cria um ícone customizado usando HTML e o rotaciona
+const BoatMarker = memo(({ position, heading }) => {
   const iconMarkup = renderToStaticMarkup(
     <div style={{ transform: `rotate(${heading}deg)` }}>
       <FaLocationArrow />
@@ -15,11 +15,18 @@ const BoatMarker = ({ position, heading }) => {
 
   const customMarkerIcon = L.divIcon({
     html: iconMarkup,
-    className: 'boat-marker-icon', // Classe para estilização
+    className: 'boat-marker-icon',
     iconSize: [24, 24],
   });
 
   return <Marker position={position} icon={customMarkerIcon} />;
+});
+
+BoatMarker.propTypes = {
+  position: PropTypes.arrayOf(PropTypes.number).isRequired,
+  heading: PropTypes.number.isRequired,
 };
+
+BoatMarker.displayName = 'BoatMarker';
 
 export default BoatMarker;

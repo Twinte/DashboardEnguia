@@ -1,19 +1,25 @@
 // src/utils/geolocation.js
 
 /**
- * Calcula a distância em quilômetros entre duas coordenadas geográficas usando a fórmula de Haversine.
- * @param {number} lat1 - Latitude do ponto 1.
- * @param {number} lng1 - Longitude do ponto 1.
- * @param {number} lat2 - Latitude do ponto 2.
- * @param {number} lng2 - Longitude do ponto 2.
- * @returns {number} A distância em km.
+ * @typedef {Object} Coordinate
+ * @property {number} lat - Latitude in decimal degrees.
+ * @property {number} lng - Longitude in decimal degrees.
+ */
+
+/**
+ * Calculates the distance between two geographic coordinates using the Haversine formula.
+ * @param {number|null} lat1 - Latitude of point 1 in decimal degrees.
+ * @param {number|null} lng1 - Longitude of point 1 in decimal degrees.
+ * @param {number|null} lat2 - Latitude of point 2 in decimal degrees.
+ * @param {number|null} lng2 - Longitude of point 2 in decimal degrees.
+ * @returns {number} Distance in kilometers. Returns 0 if any coordinate is null/undefined.
  */
 export const getDistance = (lat1, lng1, lat2, lng2) => {
   if (lat1 == null || lng1 == null || lat2 == null || lng2 == null) {
     return 0;
   }
-  
-  const R = 6371; // Raio da Terra em km
+
+  const R = 6371; // Earth's radius in km
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lng2 - lng1) * (Math.PI / 180);
   const a =
@@ -23,31 +29,35 @@ export const getDistance = (lat1, lng1, lat2, lng2) => {
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c; // Distância em km
+  const distance = R * c;
   return distance;
 };
 
 /**
- * Converte graus para radianos
+ * Converts degrees to radians.
+ * @param {number} deg - Angle in degrees.
+ * @returns {number} Angle in radians.
  */
 function toRad(deg) {
   return deg * (Math.PI / 180);
 }
 
 /**
- * Converte radianos para graus
+ * Converts radians to degrees.
+ * @param {number} rad - Angle in radians.
+ * @returns {number} Angle in degrees.
  */
 function toDeg(rad) {
   return rad * (180 / Math.PI);
 }
 
 /**
- * Calcula o rumo inicial (bearing) em graus de um ponto 1 para um ponto 2.
- * @param {number} lat1 - Latitude do ponto 1.
- * @param {number} lng1 - Longitude do ponto 1.
- * @param {number} lat2 - Latitude do ponto 2.
- * @param {number} lng2 - Longitude do ponto 2.
- * @returns {number} O rumo em graus (0-360).
+ * Calculates the initial bearing (forward azimuth) from point 1 to point 2.
+ * @param {number|null} lat1 - Latitude of point 1 in decimal degrees.
+ * @param {number|null} lng1 - Longitude of point 1 in decimal degrees.
+ * @param {number|null} lat2 - Latitude of point 2 in decimal degrees.
+ * @param {number|null} lng2 - Longitude of point 2 in decimal degrees.
+ * @returns {number} Bearing in degrees (0-360). Returns 0 if any coordinate is null/undefined.
  */
 export const getBearing = (lat1, lng1, lat2, lng2) => {
   if (lat1 == null || lng1 == null || lat2 == null || lng2 == null) {
@@ -63,9 +73,9 @@ export const getBearing = (lat1, lng1, lat2, lng2) => {
   const y = Math.sin(Δλ) * Math.cos(φ2);
   const x = Math.cos(φ1) * Math.sin(φ2) -
             Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
-  
+
   let brng = toDeg(Math.atan2(y, x));
-  
-  // Normaliza o resultado para 0-360 graus
+
+  // Normalize to 0-360 degrees
   return (brng + 360) % 360;
 };

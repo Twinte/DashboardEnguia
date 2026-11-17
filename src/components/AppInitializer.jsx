@@ -1,5 +1,5 @@
 // src/components/AppInitializer.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import SponsorsScreen from './SponsorsScreen';
 import App from '../App';
 
