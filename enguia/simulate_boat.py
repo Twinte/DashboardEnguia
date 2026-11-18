@@ -141,6 +141,43 @@ def getTrimPosition(current_trim, direction):
     return current_trim
 
 
+def get_electrical_diagnostics(voltage, current, temperature, battery_percentage):
+    auxiliary_voltage = round(random.uniform(12.4, 12.8), 1)
+    auxiliary_current = round(random.uniform(1.5, 3.0), 1)
+    ports = {}
+    for port, volts, amps, limit in (
+        ("P1", voltage, current, 20),
+        ("P2", auxiliary_voltage, auxiliary_current, 0.1),
+        ("P3", 0, 0, 10),
+    ):
+        ports[port] = {
+            "voltage": volts,
+            "current": amps,
+            "power_kw": round(volts * amps / 1000, 3),
+            "limit_kw": limit,
+        }
+    cell_voltage = voltage / 96
+    return {
+        "simulated": True,
+        "ports": ports,
+        "bms": {
+            "cell_min": round(cell_voltage - 0.02, 2),
+            "cell_max": round(cell_voltage + 0.02, 2),
+            "temp_min": round(temperature - 2, 1),
+            "temp_max": round(temperature + 2, 1),
+        },
+        "supercapacitors": {
+            "energy_pct": round(battery_percentage * 0.85, 1),
+            "balancing": False,
+        },
+        "converter": {
+            "precharge_complete": True,
+            "contactors_closed": True,
+            "ccs2_charging": False,
+        },
+    }
+
+
 def simulate_electric_boat_forever(delay=1):
     battery_percentage = 100
     current_speed = 0
@@ -149,6 +186,13 @@ def simulate_electric_boat_forever(delay=1):
     current_lat = BASE_LAT
     current_lng = BASE_LNG
     battery_cycles = 0
+    alarm_events = [{
+        "source": "simulator",
+        "severity": "info",
+        "code": "SIM_STARTED",
+        "time": getTimestamp(),
+        "acknowledged": None,
+    }]
 
     session = create_session_with_retries()
 
@@ -186,8 +230,19 @@ def simulate_electric_boat_forever(delay=1):
             print("Bateria esgotada. Encerrando a simulação.")
             break
 
+        timestamp = getTimestamp()
+        if battery_percentage < 20 and len(alarm_events) == 1:
+            alarm_events.insert(0, {
+                "source": "battery",
+                "severity": "warning",
+                "code": "LOW_BATTERY",
+                "time": timestamp,
+                "acknowledged": False,
+            })
+
+        electrical = get_electrical_diagnostics(current_voltage, current_corrente, current_temp_c, battery_percentage)
         data = {
-            "Timestamp": getTimestamp(),
+            "Timestamp": timestamp,
             "Velocidade_KPH": current_speed,
             "RPM": current_rpm,
             "Voltagem_bateria": current_voltage,
@@ -203,7 +258,15 @@ def simulate_electric_boat_forever(delay=1):
             "wifi_connected": checkWifi(),
             "battery_time_remaining": time_remaining,
             "battery_health": battery_health,
-            "trim_bow": 0  # Center position (will be controlled via API later)
+            "trim_bow": 0,
+            "power_diagnostics": {
+                "simulated": True,
+                "emergency_stop_active": False,
+                "interlocks_satisfied": True,
+                "auxiliary_voltage": electrical["ports"]["P2"]["voltage"],
+            },
+            "electrical_diagnostics": electrical,
+            "alarm_events": alarm_events,
         }
 
         try:

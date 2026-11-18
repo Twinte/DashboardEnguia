@@ -1,9 +1,20 @@
 import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { FaBatteryHalf, FaBolt, FaDatabase, FaLeaf, FaTemperatureHigh, FaTimes } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
+import { FaBatteryHalf, FaBolt, FaDatabase, FaLeaf, FaPlug, FaTemperatureHigh, FaTimes } from 'react-icons/fa';
 import { MdCloud, MdWifi } from 'react-icons/md';
 
+const electricalCards = [
+  { title: 'port', port: 'P1', icon: FaPlug, readings: ['port_readings', 'port_limit'] },
+  { title: 'port', port: 'P2', icon: FaPlug, readings: ['port_readings', 'port_limit'] },
+  { title: 'port', port: 'P3', icon: FaPlug, readings: ['port_readings', 'port_limit'] },
+  { title: 'bms', icon: FaBatteryHalf, readings: ['cell_voltage', 'cell_temperature'] },
+  { title: 'supercapacitors', icon: FaBolt, readings: ['usable_energy', 'balancing'] },
+  { title: 'converter', icon: FaPlug, readings: ['precharge', 'ccs2_charging'] },
+];
+
 const SystemStatusDrawer = ({ open, onClose, sensorData, mqttStatus, energyMode, isUsingCachedData }) => {
+  const { t, i18n } = useTranslation();
   const closeButtonRef = useRef(null);
 
   useEffect(() => {
@@ -29,6 +40,33 @@ const SystemStatusDrawer = ({ open, onClose, sensorData, mqttStatus, energyMode,
     { icon: <FaBolt />, label: 'Current draw', value: `${sensorData.currentDraw ?? 0} A` },
   ];
 
+  const electrical = sensorData.electricalDiagnostics;
+  const number = (value, digits = 1) => Number.isFinite(value)
+    ? value.toLocaleString(i18n.resolvedLanguage, { minimumFractionDigits: digits, maximumFractionDigits: digits })
+    : '—';
+  const state = (value, enabled, disabled) => typeof value === 'boolean'
+    ? t(`status_electrical.${value ? enabled : disabled}`)
+    : t('status_electrical.pending');
+  const getReadings = (port) => {
+    const supply = electrical?.ports?.[port];
+    const { bms, supercapacitors, converter } = electrical ?? {};
+    return {
+      voltage: number(supply?.voltage),
+      current: number(supply?.current),
+      power: number(supply?.power_kw, 3),
+      limit: number(supply?.limit_kw),
+      cellMin: number(bms?.cell_min, 2),
+      cellMax: number(bms?.cell_max, 2),
+      tempMin: number(bms?.temp_min),
+      tempMax: number(bms?.temp_max),
+      energy: number(supercapacitors?.energy_pct),
+      balancing: state(supercapacitors?.balancing, 'active', 'inactive'),
+      precharge: state(converter?.precharge_complete, 'complete', 'incomplete'),
+      contactors: state(converter?.contactors_closed, 'closed', 'open'),
+      charging: state(converter?.ccs2_charging, 'active', 'inactive'),
+    };
+  };
+
   return (
     <div className="status-drawer-layer" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <aside className="status-drawer" role="dialog" aria-modal="true" aria-labelledby="system-status-title">
@@ -51,6 +89,20 @@ const SystemStatusDrawer = ({ open, onClose, sensorData, mqttStatus, energyMode,
             </div>
           ))}
         </div>
+        <section className="status-electrical-grid" aria-labelledby="status-electrical-title">
+          <h3 id="status-electrical-title">
+            {t('status_electrical.section')}{electrical?.simulated === true && ` · ${t('power_diagnostics.simulated')}`}
+          </h3>
+          {electricalCards.map(({ title, port, icon: Icon, readings }) => (
+            <div className="status-electrical-card" key={port ?? title}>
+              <Icon aria-hidden="true" />
+              <div>
+                <h4>{t(`status_electrical.${title}`, { port })}</h4>
+                {readings.map((reading) => <p key={reading}>{t(`status_electrical.${reading}`, getReadings(port))}</p>)}
+              </div>
+            </div>
+          ))}
+        </section>
       </aside>
     </div>
   );

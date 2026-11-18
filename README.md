@@ -123,6 +123,18 @@ O relatório de cobertura fica em `coverage/`. O GitHub Actions executa lint, bu
 
 ## Deployment com Docker
 
+### Desenvolvimento com Docker Compose
+
+Copie `.env.example` para `.env` e configure a URL da API conforme a seção **Como Executar o Projeto**. Na raiz do repositório, execute:
+
+```bash
+docker compose up -d
+```
+
+Abra `http://localhost:5173`. O Compose monta a pasta do checkout em `/app`, então você pode editar os arquivos diretamente no computador, inclusive com o container parado. Com o container em execução, o Vite aplica as alterações sem precisar rodar `docker compose up` novamente. As dependências ficam no volume `dashboard_node_modules`. Após alterar o `.env` ou as dependências, execute `docker compose restart dashboard`.
+
+### Produção com Docker
+
 O projeto inclui um `Dockerfile` para facilitar o deployment em produção.
 
 ### 1\. **Construir a Imagem Docker**

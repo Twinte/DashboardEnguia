@@ -8,3 +8,149 @@
 @media (max-width:899px) { .power-container { grid-template-columns:repeat(2,1fr); align-items:stretch; }.power-core-section { grid-column:1/-1; order:-1; min-height:300px; }.power-side-panel { display:contents; } }
 @media (max-width:600px) { .power-container { grid-template-columns:1fr 1fr; gap:var(--space-3); padding:var(--space-3); }.power-core-section { min-height:240px; }.power-ring-container { width:190px; }.hud-card { min-height:96px; padding:var(--space-3); flex-direction:column; align-items:flex-start; }.hud-card-info { width:100%; text-align:left; }.hud-value { font-size:1.55rem; } }
 @media (max-height:500px) and (orientation:landscape) { .power-container { grid-template-columns:1fr minmax(210px,.85fr) 1fr; gap:var(--space-2); padding:var(--space-2); }.power-core-section { grid-column:auto; order:0; min-height:0; }.power-ring-container { width:min(190px,75%); }.hud-card { min-height:68px; padding:var(--space-2) var(--space-3); }.hud-value { font-size:1.35rem; }.hud-card-icon { font-size:1rem; } }
+
+.core-percentage {
+  color: #8af5b4;
+  -webkit-text-stroke: 0.02em currentColor;
+}
+
+body.light .core-percentage {
+  color: #006640;
+}
+
+.core-percentage.core-percentage--low {
+  color: #ff9da7;
+}
+
+body.light .core-percentage--low {
+  color: #b3223c;
+}
+
+.power-container {
+  min-height: 0;
+  align-items: stretch;
+}
+
+.power-diagnostics,
+.power-alarms {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.power-diagnostics {
+  order: -2;
+}
+
+.power-section-title {
+  margin: 0 0 var(--space-3);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.power-diagnostics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: var(--space-3);
+}
+
+.power-diagnostic-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-inline-start: 2px solid var(--accent);
+  border-radius: var(--radius-card);
+}
+
+.power-diagnostic-card svg {
+  flex: none;
+  color: var(--accent);
+  font-size: 1.25rem;
+}
+
+.power-diagnostic-card h3,
+.power-diagnostic-card p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.power-diagnostic-card h3 {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.power-diagnostic-card p {
+  margin-top: var(--space-1);
+  font-weight: 600;
+}
+
+.power-alarms {
+  padding: var(--space-4);
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+}
+
+.power-alarms-scroll {
+  overflow-x: auto;
+}
+
+.power-alarms table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.power-alarms th,
+.power-alarms td {
+  padding: var(--space-2);
+  text-align: start;
+}
+
+.power-alarms th {
+  background: var(--surface-subtle);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.power-alarms td {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 899px) {
+  .power-diagnostics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hud-label {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 380px) {
+  .power-diagnostics-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) and (min-width: 680px) {
+  .power-side-panel {
+    display: grid;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) and (max-width: 679px) {
+  .power-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .power-core-section {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+}

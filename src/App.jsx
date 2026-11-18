@@ -51,9 +51,8 @@ function App() {
           {(fetchError || isUsingCachedData) && <FaExclamationTriangle className="system-summary__alert" aria-label={t('sensor_data_unavailable')} />}
           <MdMoreHoriz aria-hidden="true" />
         </button>
+        <AlertsDisplay />
       </header>
-
-      <AlertsDisplay />
 
       <main className="main-dash">
         {fetchError && !isUsingCachedData ? (

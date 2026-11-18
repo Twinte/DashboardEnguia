@@ -174,6 +174,27 @@ export const SensorDataProvider = ({ children }) => {
         }
         if (data.wifi_connected != null) newData.wifiConnected = Boolean(data.wifi_connected);
         if (typeof data.battery_health === 'string') newData.batteryHealth = data.battery_health;
+        const diagnostics = data.power_diagnostics;
+        if (diagnostics && typeof diagnostics === 'object' && !Array.isArray(diagnostics)) {
+          newData.powerDiagnostics = {
+            simulated: diagnostics.simulated === true,
+            emergencyStopActive: typeof diagnostics.emergency_stop_active === 'boolean'
+              ? diagnostics.emergency_stop_active : null,
+            interlocksSatisfied: typeof diagnostics.interlocks_satisfied === 'boolean'
+              ? diagnostics.interlocks_satisfied : null,
+            auxiliaryVoltage: Number.isFinite(diagnostics.auxiliary_voltage)
+              ? diagnostics.auxiliary_voltage : null,
+          };
+        }
+        const electrical = data.electrical_diagnostics;
+        if (electrical && typeof electrical === 'object' && !Array.isArray(electrical)) {
+          newData.electricalDiagnostics = electrical;
+        }
+        if (Array.isArray(data.alarm_events)) {
+          newData.alarmEvents = data.alarm_events.filter((event) =>
+            event && ['source', 'severity', 'code', 'time'].every((field) => typeof event[field] === 'string')
+          );
+        }
 
         setSensorData(newData);
         saveCachedData(newData);

@@ -6,7 +6,11 @@ import {
   FaRegClock,
   FaChargingStation,
   FaHeartbeat,
-  FaLayerGroup
+  FaLayerGroup,
+  FaBroadcastTower,
+  FaExclamationTriangle,
+  FaLock,
+  FaPlug
 } from 'react-icons/fa';
 import { IoBarChart } from "react-icons/io5";
 import { useSensorData } from '../context/SensorDataContext';
@@ -14,9 +18,11 @@ import { useSettings } from '../context/SettingsContext'; // Import Settings Con
 import { renderSensorValue } from '../utils/formatters';
 import './PowerPage.css';
 
+const alarmColumns = ['source', 'severity', 'code', 'time', 'acknowledgement'];
+
 const PowerPage = () => {
   const { t } = useTranslation();
-  const { sensorData } = useSensorData();
+  const { sensorData, isLoading, isUsingCachedData } = useSensorData();
   const { energyMode } = useSettings();
 
   const percentage = sensorData?.batteryPercentage || 0;
@@ -34,9 +40,48 @@ const PowerPage = () => {
   };
 
   const batteryColor = getStatusColor(percentage, 'batt');
+  const communicationStatus = isUsingCachedData
+    ? 'cached'
+    : isLoading ? 'waiting' : 'receiving';
+
+  const { powerDiagnostics, alarmEvents } = sensorData ?? {};
+  const { simulated, emergencyStopActive, interlocksSatisfied, auxiliaryVoltage } = powerDiagnostics ?? {};
+  const diagnosticText = (key) => t(`power_diagnostics.${key}`);
+  const alarmText = (key, value) => t(`power_alarms.${key}_${value}`, { defaultValue: value });
+  const diagnosticCards = [
+    {
+      label: 'emergency_stop', icon: FaExclamationTriangle,
+      value: diagnosticText(emergencyStopActive == null ? 'pending' : emergencyStopActive ? 'stop_active' : 'stop_released'),
+    },
+    {
+      label: 'interlocks', icon: FaLock,
+      value: diagnosticText(interlocksSatisfied == null ? 'pending' : interlocksSatisfied ? 'interlocks_satisfied' : 'interlocks_open'),
+    },
+    {
+      label: 'auxiliary_power', icon: FaPlug,
+      value: auxiliaryVoltage == null ? diagnosticText('voltage_unavailable') : `${renderSensorValue(auxiliaryVoltage, '', 1)} V`,
+    },
+    { label: 'communication', icon: FaBroadcastTower, value: diagnosticText(communicationStatus) },
+  ];
 
   return (
     <div className="power-container">
+      <section className="power-diagnostics" aria-labelledby="power-diagnostics-title">
+        <h2 className="power-section-title" id="power-diagnostics-title">
+          {diagnosticText('title')}{simulated && ` · ${diagnosticText('simulated')}`}
+        </h2>
+        <div className="power-diagnostics-grid">
+          {diagnosticCards.map(({ label, icon: Icon, value }) => (
+            <div className="power-diagnostic-card" key={label}>
+              <Icon aria-hidden="true" />
+              <div>
+                <h3>{t(`power_diagnostics.${label}`)}</h3>
+                <p>{value}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* --- LEFT PANEL: ELECTRICAL & HEALTH --- */}
       <div className="power-side-panel left">
@@ -85,7 +130,7 @@ const PowerPage = () => {
 
           <div className="core-value">
             <FaChargingStation className="core-icon" style={{ color: batteryColor }}/>
-            <span className="core-percentage" style={{ color: batteryColor, textShadow: `0 0 30px ${batteryColor}60` }}>
+            <span className={`core-percentage${percentage < 20 ? ' core-percentage--low' : ''}`}>
               {percentage}%
             </span>
             <span className="core-label">ENERGY</span>
@@ -131,6 +176,36 @@ const PowerPage = () => {
         </div>
 
       </div>
+
+      <section className="power-alarms" aria-labelledby="power-alarms-title">
+        <h2 className="power-section-title" id="power-alarms-title">
+          {t('power_alarms.title')}{simulated && ` · ${diagnosticText('simulated')}`}
+        </h2>
+        <div className="power-alarms-scroll" role="region" aria-labelledby="power-alarms-title" tabIndex={0}>
+          <table aria-labelledby="power-alarms-title">
+            <thead>
+              <tr>
+                {alarmColumns.map((column) => <th key={column} scope="col">{t(`power_alarms.${column}`)}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {alarmEvents?.length ? alarmEvents.map(({ source, severity, code, time, acknowledged }) => (
+                <tr key={`${source}:${code}:${time}`}>
+                  <td>{alarmText('source', source)}</td>
+                  <td>{alarmText('severity', severity)}</td>
+                  <td>{code}</td>
+                  <td>{time}</td>
+                  <td>{acknowledged == null ? '—' : t(acknowledged ? 'power_alarms.acknowledged' : 'power_alarms.unacknowledged')}</td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={alarmColumns.length}>{t(alarmEvents ? 'power_alarms.empty' : 'power_alarms.pending')}</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
     </div>
   );
