@@ -8,8 +8,8 @@ import {
   FaHeartbeat,
   FaLayerGroup,
   FaBroadcastTower,
-  FaExclamationTriangle,
-  FaLock,
+  FaClock,
+  FaCog,
   FaPlug
 } from 'react-icons/fa';
 import { IoBarChart } from "react-icons/io5";
@@ -34,7 +34,7 @@ const PowerPage = () => {
 
   // Determine colors based on status
   const getStatusColor = (val, type) => {
-    if (type === 'temp') return val > 50 ? '#E74C3C' : '#00A3FF';
+    if (type === 'temp') return val > 45 ? '#E74C3C' : '#00A3FF';
     if (type === 'batt') return val < 20 ? '#E74C3C' : '#2ECC71';
     return '#FFFFFF';
   };
@@ -45,17 +45,17 @@ const PowerPage = () => {
     : isLoading ? 'waiting' : 'receiving';
 
   const { powerDiagnostics, alarmEvents } = sensorData ?? {};
-  const { simulated, emergencyStopActive, interlocksSatisfied, auxiliaryVoltage } = powerDiagnostics ?? {};
+  const { simulated, boosterAvailable, operationalHealthy, auxiliaryVoltage } = powerDiagnostics ?? {};
   const diagnosticText = (key) => t(`power_diagnostics.${key}`);
   const alarmText = (key, value) => t(`power_alarms.${key}_${value}`, { defaultValue: value });
   const diagnosticCards = [
     {
-      label: 'emergency_stop', icon: FaExclamationTriangle,
-      value: diagnosticText(emergencyStopActive == null ? 'pending' : emergencyStopActive ? 'stop_active' : 'stop_released'),
+      label: 'booster_availability', icon: FaClock,
+      value: diagnosticText(boosterAvailable == null ? 'pending' : boosterAvailable ? 'available' : 'unavailable'),
     },
     {
-      label: 'interlocks', icon: FaLock,
-      value: diagnosticText(interlocksSatisfied == null ? 'pending' : interlocksSatisfied ? 'interlocks_satisfied' : 'interlocks_open'),
+      label: 'operational_state', icon: FaCog,
+      value: diagnosticText(operationalHealthy == null ? 'pending' : operationalHealthy ? 'healthy' : 'problems'),
     },
     {
       label: 'auxiliary_power', icon: FaPlug,
@@ -142,7 +142,7 @@ const PowerPage = () => {
       <div className="power-side-panel right">
 
         {/* 1. Temperature */}
-        <div className={`hud-card ${temperature > 50 ? 'danger' : ''}`}>
+        <div className={`hud-card ${temperature > 45 ? 'danger' : ''}`}>
           <FaTemperatureHigh className="hud-card-icon" style={{ color: getStatusColor(temperature, 'temp') }}/>
           <div className="hud-card-info">
             <span className="hud-label">{t('temperature')}</span>

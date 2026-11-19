@@ -22,6 +22,12 @@
     "ccs2_charging": "CCS2 charging: {{charging}}"
   },
   "power_diagnostics": {
+    "booster_availability": "Booster availability",
+    "operational_state": "Operational state",
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "healthy": "Healthy",
+    "problems": "Problems",
     "simulated": "Simulation",
     "stop_released": "Released",
     "stop_active": "Active",

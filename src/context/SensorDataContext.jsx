@@ -178,6 +178,10 @@ export const SensorDataProvider = ({ children }) => {
         if (diagnostics && typeof diagnostics === 'object' && !Array.isArray(diagnostics)) {
           newData.powerDiagnostics = {
             simulated: diagnostics.simulated === true,
+            boosterAvailable: typeof diagnostics.booster_available === 'boolean'
+              ? diagnostics.booster_available : null,
+            operationalHealthy: typeof diagnostics.operational_healthy === 'boolean'
+              ? diagnostics.operational_healthy : null,
             emergencyStopActive: typeof diagnostics.emergency_stop_active === 'boolean'
               ? diagnostics.emergency_stop_active : null,
             interlocksSatisfied: typeof diagnostics.interlocks_satisfied === 'boolean'

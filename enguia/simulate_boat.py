@@ -69,10 +69,9 @@ def getVelocidadeVento():
 
 def getTemperatura(current_temp):
     max_temp = 45
-    min_temp = 20
     temp_increase = random.uniform(0.1, 0.3)
     if current_temp < max_temp:
-        return round(current_temp + temp_increase, 1)
+        return min(max_temp, round(current_temp + temp_increase, 1))
     return current_temp
 
 # --- NOVO: Função para simular Corrente Elétrica ---
@@ -261,6 +260,8 @@ def simulate_electric_boat_forever(delay=1):
             "trim_bow": 0,
             "power_diagnostics": {
                 "simulated": True,
+                "booster_available": battery_percentage >= 20 and current_temp_c <= 45,
+                "operational_healthy": battery_percentage >= 20 and current_temp_c <= 45,
                 "emergency_stop_active": False,
                 "interlocks_satisfied": True,
                 "auxiliary_voltage": electrical["ports"]["P2"]["voltage"],
