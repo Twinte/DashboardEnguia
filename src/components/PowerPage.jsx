@@ -9,7 +9,6 @@ import {
   FaLayerGroup,
   FaBroadcastTower,
   FaClock,
-  FaCog,
   FaPlug
 } from 'react-icons/fa';
 import { IoBarChart } from "react-icons/io5";
@@ -45,7 +44,7 @@ const PowerPage = () => {
     : isLoading ? 'waiting' : 'receiving';
 
   const { powerDiagnostics, alarmEvents } = sensorData ?? {};
-  const { simulated, boosterAvailable, operationalHealthy, auxiliaryVoltage } = powerDiagnostics ?? {};
+  const { simulated, boosterAvailable, auxiliaryVoltage } = powerDiagnostics ?? {};
   const diagnosticText = (key) => t(`power_diagnostics.${key}`);
   const alarmText = (key, value) => t(`power_alarms.${key}_${value}`, { defaultValue: value });
   const diagnosticCards = [
@@ -54,8 +53,8 @@ const PowerPage = () => {
       value: diagnosticText(boosterAvailable == null ? 'pending' : boosterAvailable ? 'available' : 'unavailable'),
     },
     {
-      label: 'operational_state', icon: FaCog,
-      value: diagnosticText(operationalHealthy == null ? 'pending' : operationalHealthy ? 'healthy' : 'problems'),
+      label: 'recharge_time', icon: FaRegClock,
+      value: '-',
     },
     {
       label: 'auxiliary_power', icon: FaPlug,

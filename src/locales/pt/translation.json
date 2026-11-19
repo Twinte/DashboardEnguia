@@ -22,6 +22,7 @@
     "ccs2_charging": "Recarga CCS2: {{charging}}"
   },
   "power_diagnostics": {
+    "recharge_time": "Tempo para recarga",
     "booster_availability": "Disponibilidade de booster",
     "operational_state": "Estado operacional",
     "available": "Disponível",
